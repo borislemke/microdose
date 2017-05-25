@@ -1,5 +1,5 @@
 # microdose
-A feather-light JavaScript API framework for Node, written 100% in TypeScript, built for micro-services.
+A feather-light JavaScript API framework for Node, written 100% in TypeScript, built for micro-services. `microdose` is microdosing for servers.
 
 This project is in it's early design stages. Things will break and the syntax is changing rapidly. Contributions to the project is highly encouraged and appreciated.
 

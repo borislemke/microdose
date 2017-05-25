@@ -2,7 +2,6 @@ import {MiddlewareFunction} from './middleware'
 import {PartyRouterStack} from './router'
 import {ensureURIValid} from './utils/ensure_url'
 
-
 const baseMethod = (method) => function (route?: string | Function, middleware?: MiddlewareFunction) {
 
     if (arguments.length > 2) {
@@ -40,7 +39,6 @@ const baseMethod = (method) => function (route?: string | Function, middleware?:
             return _stack.routerName === target.constructor.name
         })
 
-
         if (middleware) {
             const originalFunction = handler
             handler = (req, res) =>
@@ -66,7 +64,6 @@ const baseMethod = (method) => function (route?: string | Function, middleware?:
         return descriptor.value
     }
 }
-
 
 export const MicroMethod = {
     Get: baseMethod('GET'),

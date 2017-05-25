@@ -2,7 +2,6 @@
     "extends": "tslint-config-standard",
     "rules": {
         "space-before-function-paren": false,
-        "no-consecutive-blank-lines": false,
         "ter-indent": 4
     }
 }

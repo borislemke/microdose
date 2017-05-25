@@ -1,21 +1,16 @@
 import {ServerResponse} from 'http'
 import {HTTPStatusCodes} from './status_codes'
 
-
 export interface MicroResponse extends ServerResponse, MicroResponseBuilder {
 }
-
 
 export interface ResponseHeaders {
     [key: string]: string
 }
 
-
 export class MicroResponseBuilder {
 
-
     native: ServerResponse
-
 
     /**
      * Default response status code
@@ -23,7 +18,6 @@ export class MicroResponseBuilder {
      * @private
      */
     private _statusCode: HTTPStatusCodes = 200
-
 
     /**
      * Default Content-Type header
@@ -34,11 +28,9 @@ export class MicroResponseBuilder {
         'Content-Type': 'text/plain; charset=utf-8'
     }
 
-
     constructor(_res: ServerResponse) {
         this.native = _res
     }
-
 
     public static create(res: ServerResponse): MicroResponse {
 
@@ -54,12 +46,10 @@ export class MicroResponseBuilder {
         return (res as MicroResponse)
     }
 
-
     set(key: string, value: string): void {
 
         this.native.setHeader(key, value)
     }
-
 
     /**
      * Sets the status code of the current response Object
@@ -73,7 +63,6 @@ export class MicroResponseBuilder {
         // Force type assertion as TS does not understand that the Object is dynamically merged
         return ((this as any) as MicroResponse)
     }
-
 
     public send(payload?: any): void {
 

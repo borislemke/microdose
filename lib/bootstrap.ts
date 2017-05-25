@@ -8,13 +8,11 @@ import {microCredits} from './utils/credits'
 import {PartyRouterStack} from './router'
 const numCPUs = os.cpus().length
 
-
 export interface BootstrapConfig {
     port?: number
     cluster?: boolean
     useSocket?: boolean
 }
-
 
 function startCluster(bootStrap: Function) {
 
@@ -38,7 +36,6 @@ function startCluster(bootStrap: Function) {
         bootStrap()
     }
 }
-
 
 export const MicroBootstrap = (serverApp, config: BootstrapConfig | number) => {
 
@@ -66,7 +63,7 @@ export const MicroBootstrap = (serverApp, config: BootstrapConfig | number) => {
         const topRoutes = PartyRouterStack.find(_stack => _stack.routerName === serverApp.name)
 
         if (!topRoutes) {
-            console.warn('No root routerStack found. If you intended not to add any routerStack to the main Party, ignore this message.')
+            console.log('WARNING: No root handlers found. If you intended not to add any RouterStack items to the main Router, ignore this message.')
         } else {
             RouteStack.addStack(...topRoutes.routerStack)
         }
@@ -78,6 +75,9 @@ export const MicroBootstrap = (serverApp, config: BootstrapConfig | number) => {
         /** TODO(opt): Optimize statement */
         if (useSocket) {
 
+            /**
+             * TODO(opt): do not use global
+             */
             Object.defineProperty(global, 'USE_SOCKET', {
                 get: () => true
             })
@@ -86,14 +86,14 @@ export const MicroBootstrap = (serverApp, config: BootstrapConfig | number) => {
             console.log('\x1b[33m%s\x1b[0m', '    WARNING: BootstrapConfig.useSocket is a highly experimental feature. Do not rely on it in production.')
             console.log('')
 
-            server = uws.http.createServer((req, res) => {
-                RouteStack.matchRequest(req, res)
-            })
+            /** @experimental */
+            /** @deprecated */
+            server = uws.http.createServer((req, res) => RouteStack.matchRequest(req, res))
 
         } else {
 
             /**
-             * TODO(opt):
+             * TODO(opt): do not use global
              */
             Object.defineProperty(global, 'USE_SOCKET', {
                 get: () => false
@@ -102,12 +102,18 @@ export const MicroBootstrap = (serverApp, config: BootstrapConfig | number) => {
             server = http.createServer((req, res) => RouteStack.matchRequest(req, res))
         }
 
-        server.listen(port, () => {
-            microCredits(port)
-        })
+        /**
+         * TODO(opt): Return as promise / callback
+         * So the user knows for sure when microdose is up and running
+         */
+        server.listen(port, () => microCredits(port))
     }
 
     if (clusterize) {
+        /**
+         * TODO(opt): We might want remove this from the core of microdose and
+         * TODO(opt): leave it to the developer?
+         */
         startCluster(bootStrap)
     } else {
         bootStrap()

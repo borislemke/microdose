@@ -8,7 +8,6 @@ import {
 } from '.'
 import * as bodyParser from 'body-parser'
 
-
 const sampleMiddleware: MiddlewareFunction = (req, res, next) => {
 
     console.log('Test middleware message')
@@ -17,7 +16,6 @@ const sampleMiddleware: MiddlewareFunction = (req, res, next) => {
 
     next(req)
 }
-
 
 @MicroRouter({
     middleware: [sampleMiddleware]
@@ -35,7 +33,6 @@ class ChildRouter {
         res.send('someone')
     }
 }
-
 
 @MicroRouter({
     middleware: [bodyParser.json()],
@@ -71,9 +68,8 @@ class ServerApp {
     }
 }
 
-
 MicroBootstrap(ServerApp, {
     port: 3000,
     cluster: false,
-    useSocket: false,
+    useSocket: false
 })

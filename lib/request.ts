@@ -1,30 +1,22 @@
 import {IncomingMessage} from 'http'
 
-
 export interface MicroRequest extends IncomingMessage, MicroRequestBuilder {
 }
 
-
 export class MicroRequestBuilder {
-
 
     native: IncomingMessage
 
-
     body: any = {}
-
 
     local: any = {}
 
-
     params: any = {}
-
 
     constructor(request) {
 
         this.native = request
     }
-
 
     public static create(req: IncomingMessage): MicroRequest {
 

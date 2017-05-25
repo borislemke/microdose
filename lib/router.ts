@@ -2,7 +2,6 @@ import {MiddlewareFunction} from './middleware'
 import {RouteStack} from './route_stack'
 import {ensureURIValid} from './utils/ensure_url'
 
-
 export interface RouterChild {
     prefix: string
     router: Function
@@ -21,7 +20,6 @@ export interface PartyStack {
 
 export const PartyRouterStack: PartyStack[] = []
 
-
 export function MicroRouter(config: RouterConfig = null) {
 
     return function (target): any {
@@ -35,18 +33,22 @@ export function MicroRouter(config: RouterConfig = null) {
 
                 config.children.forEach(_routerChild => {
 
-                    let indexOfChildRouter = null
+                    /**
+                     * Look up for a RouterStack that is a direct child of the current RouterStack
+                     * @type {PartyStack}
+                     */
+                    const partyRouterChildren = PartyRouterStack.find((_stack, index) =>
+                    _stack.routerName === _routerChild.router.name)
 
-                    const partyRouterChildren = PartyRouterStack.find((_stack, index) => {
-
-                        indexOfChildRouter = index
-
-                        return _stack.routerName === _routerChild.router.name
-                    })
-
+                    /**
+                     * If the current RouterStack has any children,
+                     * we want to apply the prefix for each of their handlers
+                     */
                     if (partyRouterChildren && partyRouterChildren.routerStack.length) {
 
-                        partyRouterChildren.routerStack.forEach(_childRoute => {
+                        partyRouterChildren
+                        .routerStack
+                        .forEach(_childRoute => {
 
                             _childRoute.path = ensureURIValid(routerPrefix, _routerChild.prefix, _childRoute.path)
 
@@ -54,7 +56,8 @@ export function MicroRouter(config: RouterConfig = null) {
 
                                 const originalHandler = _childRoute.handler
 
-                                config.middleware.forEach(_middleware => {
+                                config.middleware
+                                .forEach(_middleware => {
                                     _childRoute.handler = (req, res) =>
                                         _middleware(req, res, (req2, res2) =>
                                             originalHandler(req2 || req, res2 || res))
@@ -75,12 +78,15 @@ export function MicroRouter(config: RouterConfig = null) {
 
                     _routerStack.routerStack = _routerStack.routerStack.map(_stack => {
 
-                        // Apply Router and Router children scoped prefix if provided
+                        // Apply Router and Router children scoped `prefix` if provided
                         _stack.path = ensureURIValid(routerPrefix, _stack.path)
 
                         return _stack
                     })
 
+                    /**
+                     * Wrap all functions inside a MiddlewareFunction if provided
+                     */
                     if (config.middleware) {
 
                         config.middleware.forEach(_middleware => {

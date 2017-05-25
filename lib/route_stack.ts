@@ -5,21 +5,17 @@ import {IncomingMessage, ServerResponse} from 'http'
 import {HTTPStatusCodes} from './status_codes'
 const pathToRegexp = require('path-to-regexp')
 
-
 export interface StackItem {
     path: string
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
     handler: (req: MicroRequest, res: MicroResponse) => void
 }
 
-
 export interface RouteStackGroup {
     [method: string]: StackItem[]
 }
 
-
 export class RouteStackCompiler {
-
 
     /**
      * All path stack collected from the MicroMethod decorator will
@@ -35,7 +31,6 @@ export class RouteStackCompiler {
         PATCH: []
     }
 
-
     addStack(...stackItems: StackItem[]): void {
 
         // Ensure stackItems is an array
@@ -50,11 +45,10 @@ export class RouteStackCompiler {
         })
     }
 
-
     /**
      * Make as efficient as possible, this is the only function
      * that is run to map incoming requests.
-     * Treat this function as the most performance sensitive ever. EVER.
+     * Treat this as the most performance sensitive function of all
      */
     matchRequest(req: IncomingMessage, res: ServerResponse) {
 
@@ -90,16 +84,23 @@ export class RouteStackCompiler {
             /** TODO(perf): offload path matching to C module */
             const reg = pathToRegexp(curr.path)
 
+            // Tries to look up a match to the incoming request's URL
             const regExec = reg.exec(incomingRequestRoute)
 
+            // If no match found, return immediately
             if (!regExec) continue
 
             for (let i = 0; i < reg.keys.length; i++) {
                 const matchValue = regExec[i + 1]
                 const matchKey = reg.keys[i].name
+                // Assign the matching parameters to the params object
+                // to be passed on to the MicroResponse
                 params[matchKey] = matchValue
             }
 
+            // If any matching params were found
+            // mark the currently iterated routerStack as a match
+            // and break out of the loop
             if (Object.keys(params).length) {
                 routeMatch = curr
                 break
@@ -109,8 +110,7 @@ export class RouteStackCompiler {
         const mResponse = MicroResponseBuilder.create(res)
 
         if (!routeMatch) {
-            // No matching path handler found
-            // Return 404
+            // No matching path handler found return 404
             mResponse.status(HTTPStatusCodes.NOT_FOUND).send('Not Found')
             return
         }

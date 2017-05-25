@@ -1,7 +1,6 @@
 import {MicroRequest} from './request'
 import {MicroResponse} from './response'
 
-
 export interface NextFunction {
     (req?: MicroRequest, res?: MicroResponse): void
 }

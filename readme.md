@@ -144,3 +144,4 @@ Visit `http://localhost:3000` to see `Hello World`.
 
 ## Future
 - Offload path mapping to native Node module
+- Replace `path-to-regexp` with simpler custom alternative

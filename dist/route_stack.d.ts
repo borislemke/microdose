@@ -22,7 +22,7 @@ export declare class RouteStackCompiler {
     /**
      * Make as efficient as possible, this is the only function
      * that is run to map incoming requests.
-     * Treat this function as the most performance sensitive ever. EVER.
+     * Treat this as the most performance sensitive function of all
      */
     matchRequest(req: IncomingMessage, res: ServerResponse): void;
 }

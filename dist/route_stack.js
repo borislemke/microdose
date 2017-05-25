@@ -38,7 +38,7 @@ var RouteStackCompiler = (function () {
     /**
      * Make as efficient as possible, this is the only function
      * that is run to map incoming requests.
-     * Treat this function as the most performance sensitive ever. EVER.
+     * Treat this as the most performance sensitive function of all
      */
     RouteStackCompiler.prototype.matchRequest = function (req, res) {
         var incomingRequestRoute = parseUrl(req).pathname;
@@ -65,14 +65,21 @@ var RouteStackCompiler = (function () {
             // e.g req.params.userId = `value of :userId`
             /** TODO(perf): offload path matching to C module */
             var reg = pathToRegexp(curr.path);
+            // Tries to look up a match to the incoming request's URL
             var regExec = reg.exec(incomingRequestRoute);
+            // If no match found, return immediately
             if (!regExec)
                 continue;
             for (var i_1 = 0; i_1 < reg.keys.length; i_1++) {
                 var matchValue = regExec[i_1 + 1];
                 var matchKey = reg.keys[i_1].name;
+                // Assign the matching parameters to the params object
+                // to be passed on to the MicroResponse
                 params[matchKey] = matchValue;
             }
+            // If any matching params were found
+            // mark the currently iterated routerStack as a match
+            // and break out of the loop
             if (Object.keys(params).length) {
                 routeMatch = curr;
                 break;
@@ -80,8 +87,7 @@ var RouteStackCompiler = (function () {
         }
         var mResponse = response_1.MicroResponseBuilder.create(res);
         if (!routeMatch) {
-            // No matching path handler found
-            // Return 404
+            // No matching path handler found return 404
             mResponse.status(status_codes_1.HTTPStatusCodes.NOT_FOUND).send('Not Found');
             return;
         }

@@ -40,7 +40,7 @@ exports.MicroBootstrap = function (serverApp, config) {
     var bootStrap = function () {
         var topRoutes = router_1.PartyRouterStack.find(function (_stack) { return _stack.routerName === serverApp.name; });
         if (!topRoutes) {
-            console.warn('No root routerStack found. If you intended not to add any routerStack to the main Party, ignore this message.');
+            console.log('WARNING: No root handlers found. If you intended not to add any RouterStack items to the main Router, ignore this message.');
         }
         else {
             route_stack_1.RouteStack.addStack.apply(route_stack_1.RouteStack, topRoutes.routerStack);
@@ -49,30 +49,39 @@ exports.MicroBootstrap = function (serverApp, config) {
         var server;
         /** TODO(opt): Optimize statement */
         if (useSocket) {
+            /**
+             * TODO(opt): do not use global
+             */
             Object.defineProperty(global, 'USE_SOCKET', {
                 get: function () { return true; }
             });
             console.log('');
             console.log('\x1b[33m%s\x1b[0m', '    WARNING: BootstrapConfig.useSocket is a highly experimental feature. Do not rely on it in production.');
             console.log('');
-            server = uws.http.createServer(function (req, res) {
-                route_stack_1.RouteStack.matchRequest(req, res);
-            });
+            /** @experimental */
+            /** @deprecated */
+            server = uws.http.createServer(function (req, res) { return route_stack_1.RouteStack.matchRequest(req, res); });
         }
         else {
             /**
-             * TODO(opt):
+             * TODO(opt): do not use global
              */
             Object.defineProperty(global, 'USE_SOCKET', {
                 get: function () { return false; }
             });
             server = http.createServer(function (req, res) { return route_stack_1.RouteStack.matchRequest(req, res); });
         }
-        server.listen(port, function () {
-            credits_1.microCredits(port);
-        });
+        /**
+         * TODO(opt): Return as promise / callback
+         * So the user knows for sure when microdose is up and running
+         */
+        server.listen(port, function () { return credits_1.microCredits(port); });
     };
     if (clusterize) {
+        /**
+         * TODO(opt): We might want remove this from the core of microdose and
+         * TODO(opt): leave it to the developer?
+         */
         startCluster(bootStrap);
     }
     else {

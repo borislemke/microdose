@@ -11,17 +11,26 @@ function MicroRouter(config) {
             var routerPrefix_1 = config.prefix || '';
             if (config.children) {
                 config.children.forEach(function (_routerChild) {
-                    var indexOfChildRouter = null;
+                    /**
+                     * Look up for a RouterStack that is a direct child of the current RouterStack
+                     * @type {PartyStack}
+                     */
                     var partyRouterChildren = exports.PartyRouterStack.find(function (_stack, index) {
-                        indexOfChildRouter = index;
                         return _stack.routerName === _routerChild.router.name;
                     });
+                    /**
+                     * If the current RouterStack has any children,
+                     * we want to apply the prefix for each of their handlers
+                     */
                     if (partyRouterChildren && partyRouterChildren.routerStack.length) {
-                        partyRouterChildren.routerStack.forEach(function (_childRoute) {
+                        partyRouterChildren
+                            .routerStack
+                            .forEach(function (_childRoute) {
                             _childRoute.path = ensure_url_1.ensureURIValid(routerPrefix_1, _routerChild.prefix, _childRoute.path);
                             if (config.middleware && config.middleware.length) {
                                 var originalHandler_1 = _childRoute.handler;
-                                config.middleware.forEach(function (_middleware) {
+                                config.middleware
+                                    .forEach(function (_middleware) {
                                     _childRoute.handler = function (req, res) {
                                         return _middleware(req, res, function (req2, res2) {
                                             return originalHandler_1(req2 || req, res2 || res);
@@ -38,10 +47,13 @@ function MicroRouter(config) {
                 var _routerStack_1 = exports.PartyRouterStack.find(function (_stack) { return _stack.routerName === target.name; });
                 if (_routerStack_1) {
                     _routerStack_1.routerStack = _routerStack_1.routerStack.map(function (_stack) {
-                        // Apply Router and Router children scoped prefix if provided
+                        // Apply Router and Router children scoped `prefix` if provided
                         _stack.path = ensure_url_1.ensureURIValid(routerPrefix_1, _stack.path);
                         return _stack;
                     });
+                    /**
+                     * Wrap all functions inside a MiddlewareFunction if provided
+                     */
                     if (config.middleware) {
                         config.middleware.forEach(function (_middleware) {
                             _routerStack_1.routerStack.forEach(function (_stack, index) {

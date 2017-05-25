@@ -81,6 +81,6 @@ ServerApp = __decorate([
 _1.MicroBootstrap(ServerApp, {
     port: 3000,
     cluster: false,
-    useSocket: false,
+    useSocket: false
 });
 //# sourceMappingURL=_example.js.map

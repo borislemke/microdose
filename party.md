@@ -84,3 +84,19 @@ Grouping by request method allows for faster indexing as we can match the reques
     ]
 }
 ```
+
+**Node module matcher**
+```
+// JS routes hash map
+const routeHashMap = {
+    "someHashOfFunction": "/path/:match"
+}
+
+// Imaginary node binding
+const matchHashMap = require('native-path-to-regexp')
+
+const matchHandler = matchHashMap(req.url) // should return 'get_hashOfFunction' for req.url = '/path/john'
+
+// Execute handler
+RoutesIndex[req.method][matchHandler](req, res)
+```

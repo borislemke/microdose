@@ -5,7 +5,6 @@ import {
     MicroRequest,
     MicroBootstrap
 } from '.'
-import * as uws from 'uws'
 
 @MicroRouter()
 class ServerApp {
@@ -40,6 +39,5 @@ class ServerApp {
 
 MicroBootstrap(ServerApp, {
     port: 3000,
-    turboMode: true,
-    server: uws.http
+    turboMode: true
 })

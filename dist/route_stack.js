@@ -51,18 +51,6 @@ var RouteStackCompiler = (function () {
          * @time - 12:14 PM
          */
         var turboMode = typeof global['TURBO_MODE'] !== 'undefined' && global['TURBO_MODE'];
-        // The URL of the current request
-        var incomingRequestPath = parseUrl(req).pathname;
-        /**
-         * TODO(production): Remove, browser testing only
-         * @date - 5/27/17
-         * @time - 2:56 AM
-         */
-        if (incomingRequestPath.includes('favicon')) {
-            res.writeHead(204, { 'Content-Type': 'plain/text' });
-            res.end();
-            return;
-        }
         var matchingRoutesStack = this._routeStack[req.method];
         // Early return if routerStack by method has no handlers
         if (!matchingRoutesStack.length) {
@@ -77,10 +65,22 @@ var RouteStackCompiler = (function () {
             // Retrieve first handler of the matching router stack
             matchingRoutesStack[0].handler(mRequest_1, mResponse_1);
             // There can only be 1 handler per method if on turboMode
-            if (matchingRoutesStack.length > 1) {
+            if (matchingRoutesStack.length > 1 && process.env.NODE_ENV !== 'production') {
                 console.log('');
                 console.log('\x1b[33m%s\x1b[0m', "WARNING: 'Turbo Mode' is enable but microdose detected multiple\n                handlers for " + req.method + " requests.\n");
             }
+            return;
+        }
+        // The URL of the current request
+        var incomingRequestPath = parseUrl(req).pathname;
+        /**
+         * TODO(production): Remove, browser testing only
+         * @date - 5/27/17
+         * @time - 2:56 AM
+         */
+        if (incomingRequestPath.includes('favicon')) {
+            res.writeHead(204, { 'Content-Type': 'plain/text' });
+            res.end();
             return;
         }
         // Matching routerStack for the current incoming request

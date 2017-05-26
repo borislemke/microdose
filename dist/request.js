@@ -35,25 +35,12 @@ var MicroRequestBuilder = (function () {
     }
     MicroRequestBuilder.create = function (req) {
         var _microRequest = new MicroRequestBuilder(req);
-        /**
-         * TODO(opt): Benchmark these
-         * @date - 5/26/17
-         * @time - 2:09 PM
-         */
-        // OPT1
         // Merges properties of IncomingMessage with MicroRequest
+        // Based on benchmarks of a couple methods to do this,
+        // this is the most performant of all
         for (var method in _microRequest) {
             req[method] = _microRequest[method];
         }
-        /* OPT2
-         req = {
-         ...toJSON(req),
-         ...toJSON(_microRequest)
-         } as MicroRequest
-         */
-        /* OPT3
-         * req = Object.assign({}, toJSON(req), toJSON(_microRequest))
-         */
         return req;
     };
     /**

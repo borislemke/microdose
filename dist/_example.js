@@ -7,34 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require(".");
-var bodyParser = require("body-parser");
-var sampleMiddleware = function (req, res, next) {
-    console.log('Test middleware message');
-    req.local.user = { name: 'some_user' };
-    next(req);
-};
-var ChildRouter = (function () {
-    function ChildRouter() {
-    }
-    ChildRouter.prototype.party = function (req, res) {
-        res.send(req.local.user);
-    };
-    ChildRouter.prototype.someone = function (req, res) {
-        res.send('someone');
-    };
-    return ChildRouter;
-}());
-__decorate([
-    _1.MicroMethod.Get()
-], ChildRouter.prototype, "party", null);
-__decorate([
-    _1.MicroMethod.Get('/someone')
-], ChildRouter.prototype, "someone", null);
-ChildRouter = __decorate([
-    _1.MicroRouter({
-        middleware: [sampleMiddleware]
-    })
-], ChildRouter);
+// import * as bodyParser from 'body-parser'
 var ServerApp = (function () {
     function ServerApp() {
     }
@@ -70,17 +43,15 @@ __decorate([
     _1.MicroMethod.Patch()
 ], ServerApp.prototype, "eyePath", null);
 __decorate([
-    _1.MicroMethod.Delete('/:userName')
+    _1.MicroMethod.Delete()
 ], ServerApp.prototype, "forgetMeNot", null);
 ServerApp = __decorate([
-    _1.MicroRouter({
-        middleware: [bodyParser.json()],
-        children: [{ prefix: '/party', router: ChildRouter }]
-    })
+    _1.MicroRouter({})
 ], ServerApp);
 _1.MicroBootstrap(ServerApp, {
     port: 3000,
-    cluster: false,
-    useSocket: false
+    cluster: true,
+    useSocket: false,
+    liteMode: true
 });
 //# sourceMappingURL=_example.js.map

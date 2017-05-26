@@ -12,6 +12,7 @@ export interface BootstrapConfig {
     port?: number
     cluster?: boolean
     useSocket?: boolean
+    liteMode?: boolean
 }
 
 function startCluster(bootStrap: Function) {
@@ -37,7 +38,7 @@ function startCluster(bootStrap: Function) {
     }
 }
 
-export const MicroBootstrap = (serverApp, config: BootstrapConfig | number) => {
+export const MicroBootstrap = (serverApp, config?: BootstrapConfig | number) => {
 
     let port
 
@@ -46,6 +47,20 @@ export const MicroBootstrap = (serverApp, config: BootstrapConfig | number) => {
     if (typeof config === 'object') {
         port = config.port
         clusterize = config.cluster
+        if (config.liteMode) {
+            /**
+             * TODO(global): Do not use global namespace
+             * @date - 5/26/17
+             * @time - 12:10 PM
+             */
+            Object.defineProperty(global, 'LITE_MODE', {
+                get: () => true
+            })
+
+            console.log('')
+            console.log('    LiteMode is enabled. Fasten your seat belts.')
+            console.log('')
+        }
     }
 
     if (typeof config === 'number') {

@@ -52,9 +52,26 @@ export class RouteStackCompiler {
      */
     matchRequest(req: IncomingMessage, res: ServerResponse) {
 
+        /**
+         * TODO(global): Do not use global namespace
+         * @date - 5/26/17
+         * @time - 12:14 PM
+         */
+        const liteMode: boolean = typeof global['LITE_MODE'] !== 'undefined' && global['LITE_MODE']
+
         const incomingRequestRoute = parseUrl(req).pathname
 
         const matchingRoutesStack = this._routeStack[req.method]
+
+        // If LITE_MODE is enabled, we only need to match the method as there
+        // can only be a single instance for each method
+        if (liteMode) {
+            //
+            const mResponse = MicroResponseBuilder.create(res)
+            const mRequest = MicroRequestBuilder.create(req)
+            matchingRoutesStack[0].handler(mRequest, mResponse)
+            return
+        }
 
         // Found a matching routerName stack
         let routeMatch

@@ -12,6 +12,6 @@ exports.microCredits = function (port) {
     });
     console.log('');
     if (port)
-        console.log('\x1b[33m%s\x1b[0m', 'microdose is listening on port ' + port);
+        console.log('\x1b[33m%s\x1b[0m', '       microdose is listening on port ' + port);
 };
 //# sourceMappingURL=credits.js.map

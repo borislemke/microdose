@@ -29,6 +29,19 @@ exports.MicroBootstrap = function (serverApp, config) {
     if (typeof config === 'object') {
         port = config.port;
         clusterize = config.cluster;
+        if (config.liteMode) {
+            /**
+             * TODO(global): Do not use global namespace
+             * @date - 5/26/17
+             * @time - 12:10 PM
+             */
+            Object.defineProperty(global, 'LITE_MODE', {
+                get: function () { return true; }
+            });
+            console.log('');
+            console.log('    LiteMode is enabled. Fasten your seat belts.');
+            console.log('');
+        }
     }
     if (typeof config === 'number') {
         port = config;

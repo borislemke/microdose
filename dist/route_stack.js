@@ -41,8 +41,23 @@ var RouteStackCompiler = (function () {
      * Treat this as the most performance sensitive function of all
      */
     RouteStackCompiler.prototype.matchRequest = function (req, res) {
+        /**
+         * TODO(global): Do not use global namespace
+         * @date - 5/26/17
+         * @time - 12:14 PM
+         */
+        var liteMode = typeof global['LITE_MODE'] !== 'undefined' && global['LITE_MODE'];
         var incomingRequestRoute = parseUrl(req).pathname;
         var matchingRoutesStack = this._routeStack[req.method];
+        // If LITE_MODE is enabled, we only need to match the method as there
+        // can only be a single instance for each method
+        if (liteMode) {
+            //
+            var mResponse_1 = response_1.MicroResponseBuilder.create(res);
+            var mRequest_1 = request_1.MicroRequestBuilder.create(req);
+            matchingRoutesStack[0].handler(mRequest_1, mResponse_1);
+            return;
+        }
         // Found a matching routerName stack
         var routeMatch;
         // Found parameters inside path path

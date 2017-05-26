@@ -11,5 +11,5 @@ export const microCredits = (port: number = null) => {
     })
     console.log('')
 
-    if (port) console.log('\x1b[33m%s\x1b[0m', 'microdose is listening on port ' + port)
+    if (port) console.log('\x1b[33m%s\x1b[0m', '       microdose is listening on port ' + port)
 }

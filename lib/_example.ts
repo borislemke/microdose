@@ -1,42 +1,14 @@
 import {
-    MiddlewareFunction,
     MicroRouter,
     MicroMethod,
     MicroResponse,
     MicroRequest,
     MicroBootstrap
 } from '.'
-import * as bodyParser from 'body-parser'
-
-const sampleMiddleware: MiddlewareFunction = (req, res, next) => {
-
-    console.log('Test middleware message')
-
-    req.local.user = {name: 'some_user'}
-
-    next(req)
-}
+// import * as bodyParser from 'body-parser'
 
 @MicroRouter({
-    middleware: [sampleMiddleware]
-})
-class ChildRouter {
-
-    @MicroMethod.Get()
-    party(req: MicroRequest, res: MicroResponse): void {
-
-        res.send(req.local.user)
-    }
-
-    @MicroMethod.Get('/someone')
-    someone(req: MicroRequest, res: MicroResponse): void {
-        res.send('someone')
-    }
-}
-
-@MicroRouter({
-    middleware: [bodyParser.json()],
-    children: [{prefix: '/party', router: ChildRouter}]
+    // middleware: [bodyParser.json()]
 })
 class ServerApp {
 
@@ -62,7 +34,7 @@ class ServerApp {
         res.send(req.body.patch_name)
     }
 
-    @MicroMethod.Delete('/:userName')
+    @MicroMethod.Delete()
     forgetMeNot(req: MicroRequest, res: MicroResponse): void {
         res.send(req.params.userName + ' is forever forgotten')
     }
@@ -70,6 +42,7 @@ class ServerApp {
 
 MicroBootstrap(ServerApp, {
     port: 3000,
-    cluster: false,
-    useSocket: false
+    cluster: true,
+    useSocket: false,
+    liteMode: true
 })

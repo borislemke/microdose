@@ -119,8 +119,6 @@ Benchmark results:
 
 As you can see `microdose` tops the chart amongst other popular Node frameworks, `microdose+uWS` is even faster than pure Node.js(**double!**) but there are some challenges before we can make it reliable in production. `microdose+uWS` is deemed to stall as the developers of `uWebSocket` have no interest in further developing the `uws.http` module. See this issue: [Cash for Code](https://github.com/uNetworking/uWebSockets/issues/590#issuecomment-299608041)
 
-`microdose` currently uses the `pillarjs/path-to-regexp` module to compile routes and match them with the corresponding handler on each incoming request. We imagine that we would be able to offload that task to a native Node module(in C++) to gain even more performance boost.
-
 ## Installation
 ```
 $ npm install microdose

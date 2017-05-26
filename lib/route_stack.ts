@@ -14,6 +14,11 @@ export interface RouteStackGroup {
     [method: string]: StackItem[]
 }
 
+const earlyReturn = (res: ServerResponse) => {
+    res.writeHead(HTTPStatusCodes.NOT_FOUND, {'Content-Type': 'plain/text'})
+    res.end('Not Found')
+}
+
 export class RouteStackCompiler {
 
     /**
@@ -59,9 +64,15 @@ export class RouteStackCompiler {
          */
         const liteMode: boolean = typeof global['LITE_MODE'] !== 'undefined' && global['LITE_MODE']
 
-        const incomingRequestRoute = parseUrl(req).pathname
+        // The URL of the current request
+        const incomingRequestPath = parseUrl(req).pathname
 
-        if (incomingRequestRoute.includes('favicon')) {
+        /**
+         * TODO(production): Remove, browser testing only
+         * @date - 5/27/17
+         * @time - 2:56 AM
+         */
+        if (incomingRequestPath.includes('favicon')) {
             res.writeHead(204, {'Content-Type': 'plain/text'})
             res.end()
             return
@@ -69,17 +80,29 @@ export class RouteStackCompiler {
 
         const matchingRoutesStack = this._routeStack[req.method]
 
-        // If LITE_MODE is enabled, we only need to match the method as there
-        // can only be a single instance for each method
-        if (liteMode) {
-            //
-            const mResponse = MicroResponseBuilder.create(res)
-            const mRequest = MicroRequestBuilder.create(req)
-            matchingRoutesStack[0].handler(mRequest, mResponse)
+        // Early return if routerStack by method has no handlers
+        if (!matchingRoutesStack.length) {
+            earlyReturn(res)
             return
         }
 
-        // Found a matching routerName stack
+        // If LITE_MODE is enabled, we only need to match the method as there can
+        // only be a single instance for each method. Path matching is disabled
+        if (liteMode) {
+            const mResponse = MicroResponseBuilder.create(res)
+            const mRequest = MicroRequestBuilder.create(req)
+            // Retrieve first handler of the matching router stack
+            matchingRoutesStack[0].handler(mRequest, mResponse)
+            // There can only be 1 handler per method if on liteMode
+            if (matchingRoutesStack.length > 1) {
+                console.log('')
+                console.log('\x1b[33m%s\x1b[0m', `WARNING: 'liteMode' is enable but microdose detected multiple
+                handlers for ${req.method} requests.\n`)
+            }
+            return
+        }
+
+        // Matching routerStack for the current incoming request
         let routeMatch
 
         // Found parameters inside path path
@@ -87,7 +110,7 @@ export class RouteStackCompiler {
 
         // Incoming request URL split by slashes. Used for path matching later
         // e.g /users/userName => ['users', 'username']
-        const pathChunks = incomingRequestRoute.replace(/^\/+|\/+^/, '').split('/')
+        const pathChunks = incomingRequestPath.replace(/^\/+|\/+^/, '').split('/')
 
         for (let i = 0; i < matchingRoutesStack.length; i++) {
 
@@ -95,7 +118,7 @@ export class RouteStackCompiler {
             const curr = matchingRoutesStack[i]
 
             // Break loop if exact root match found
-            if (curr.path === incomingRequestRoute) {
+            if (curr.path === incomingRequestPath) {
                 routeMatch = curr
                 break
             }
@@ -121,28 +144,6 @@ export class RouteStackCompiler {
                 }
             }
 
-            /*
-             // REMOVE path-to-regex
-             // MicroRequest should bind params data to the request
-             // e.g req.params.userId = `value of :userId`
-             // TODO(perf): offload path matching to C module
-             const reg = pathToRegexp(curr.path)
-
-             // Tries to look up a match to the incoming request's URL
-             const regExec = reg.exec(incomingRequestRoute)
-
-             // If no match found, return immediately
-             if (!regExec) continue
-
-             for (let i = 0; i < reg.keys.length; i++) {
-             const matchValue = regExec[i + 1]
-             const matchKey = reg.keys[i].name
-             // Assign the matching parameters to the params object
-             // to be passed on to the MicroResponse
-             params[matchKey] = matchValue
-             }
-             */
-
             // If any matching params were found
             // mark the currently iterated routerStack as a match
             // and break out of the loop
@@ -152,19 +153,26 @@ export class RouteStackCompiler {
             }
         }
 
-        const mResponse = MicroResponseBuilder.create(res)
-
+        /**
+         * TODO(production): Allow custom override of not found function
+         * @date - 5/27/17
+         * @time - 2:54 AM
+         */
         if (!routeMatch) {
             // No matching path handler found return 404
-            mResponse.status(HTTPStatusCodes.NOT_FOUND).send('Not Found')
+            earlyReturn(res)
             return
         }
 
+        const mResponse = MicroResponseBuilder.create(res)
+
+        // Create the request object only after a route match has been found
         const mRequest = MicroRequestBuilder.create(req)
 
         // Attach params to current request context
         if (params) mRequest.params = params
 
+        // Execute matching route handler
         routeMatch.handler(mRequest, mResponse)
     }
 }

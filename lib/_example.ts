@@ -5,17 +5,13 @@ import {
     MicroRequest,
     MicroBootstrap
 } from '.'
-// import * as bodyParser from 'body-parser'
 
-@MicroRouter({
-    // middleware: [bodyParser.json()]
-})
+@MicroRouter()
 class ServerApp {
 
-    @MicroMethod.Get('/users/:userId')
+    @MicroMethod.Get('/users')
     helloWorld(req: MicroRequest, res: MicroResponse): void {
-        // console.log('req.params.userId\n', req.params.userId)
-        res.send('Hello ' + req.params.userId)
+        res.send('Hello World')
     }
 
     @MicroMethod.Post()
@@ -43,7 +39,5 @@ class ServerApp {
 
 MicroBootstrap(ServerApp, {
     port: 3000,
-    cluster: false,
-    useSocket: false,
-    liteMode: false
+    liteMode: true
 })

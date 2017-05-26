@@ -10,9 +10,9 @@ export interface MicroRequest extends IncomingMessage, MicroRequestBuilder {
 export class MicroRequestBuilder {
 
     /**
-     * Reference to the native Node IncomingMessage
+     * Reference to the nativeResponse Node IncomingMessage
      */
-    native: IncomingMessage
+    nativeRequest: IncomingMessage
 
     /**
      * Injected object from a request payload
@@ -43,8 +43,7 @@ export class MicroRequestBuilder {
     params: any = {}
 
     constructor(request) {
-
-        this.native = request
+        this.nativeRequest = request
     }
 
     public static create(req: IncomingMessage): MicroRequest {
@@ -52,16 +51,14 @@ export class MicroRequestBuilder {
         const _microRequest = new MicroRequestBuilder(req)
 
         /**
-         * OPT1
-         * Merges properties of IncomingMessage with MicroRequest
+         * TODO(opt): Benchmark these
+         * @date - 5/26/17
+         * @time - 2:09 PM
          */
-        for (let meth in _microRequest) {
-            /**
-             * TODO(opt): Benchmark these
-             * @date - 5/26/17
-             * @time - 2:09 PM
-             */
-            req[meth] = _microRequest[meth]
+        // OPT1
+        // Merges properties of IncomingMessage with MicroRequest
+        for (let method in _microRequest) {
+            req[method] = _microRequest[method]
         }
 
         /* OPT2
@@ -87,6 +84,6 @@ export class MicroRequestBuilder {
 
         // Look up for a matching key value in the headers first
         // before looking up inside the request scoped `local` Object
-        return this.native.headers(key) || this.local[key] || null
+        return this.nativeRequest.headers(key) || this.local[key] || null
     }
 }

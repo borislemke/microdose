@@ -1,35 +1,28 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var os = require("os");
-var uws = require("uws");
 var http = require("http");
-var cluster = require("cluster");
 var route_stack_1 = require("./route_stack");
 var credits_1 = require("./utils/credits");
 var router_1 = require("./router");
-var numCPUs = os.cpus().length;
-function startCluster(bootStrap) {
-    if (cluster.isMaster) {
-        console.log("Master " + process.pid + " is running");
-        for (var i = 0; i < numCPUs; i++) {
-            cluster.fork();
-        }
-        cluster.on('exit', function (worker, code, signal) {
-            console.log("worker " + worker.process.pid + " died");
-        });
-    }
-    if (cluster.isWorker) {
-        console.log("Worker " + process.pid + " started");
-        bootStrap();
-    }
-}
-exports.MicroBootstrap = function (serverApp, config) {
-    var port;
-    var clusterize = false;
+exports.MicroBootstrap = function (serverApp, config, cb) {
     if (typeof config === 'object') {
-        port = config.port;
-        clusterize = config.cluster;
+        // Default port if not provided
+        config.port || (config.port = 3000);
+        // Default server if not provided
+        config.server || (config.server = http);
         if (config.liteMode) {
+            /**
+             * Checks if the developer is attempting to use path patterns
+             * despite enabling lite mode.
+             */
+            router_1.PartyRouterStack.forEach(function (_stack) {
+                var conflictingPathUse = _stack.routerStack.find(function (_childStack) { return _childStack.path; });
+                if (conflictingPathUse) {
+                    console.log('');
+                    console.log('\x1b[33m%s\x1b[0m', 'WARNING: Handler with path pattern ' + conflictingPathUse.path
+                        + ' will be ignored in Lite Mode.\n');
+                }
+            });
             /**
              * TODO(global): Do not use global namespace
              * @date - 5/26/17
@@ -38,67 +31,45 @@ exports.MicroBootstrap = function (serverApp, config) {
             Object.defineProperty(global, 'LITE_MODE', {
                 get: function () { return true; }
             });
-            console.log('');
-            console.log('    LiteMode is enabled. Fasten your seat belts.');
-            console.log('');
         }
     }
+    // Config passed as number, perceive as port argument
     if (typeof config === 'number') {
-        port = config;
+        config = {
+            server: http,
+            port: config
+        };
     }
+    // No config given, assign default port
     if (typeof config === 'undefined') {
-        port = 3000;
+        config = {
+            port: 3000,
+            server: http
+        };
     }
-    port || (port = 3000);
-    var bootStrap = function () {
-        var topRoutes = router_1.PartyRouterStack.find(function (_stack) { return _stack.routerName === serverApp.name; });
-        if (!topRoutes) {
-            console.log('WARNING: No root handlers found. If you intended not to add any RouterStack items to the main Router, ignore this message.');
-        }
-        else {
-            route_stack_1.RouteStack.addStack.apply(route_stack_1.RouteStack, topRoutes.routerStack);
-        }
-        var useSocket = config && config.useSocket;
-        var server;
-        /** TODO(opt): Optimize statement */
-        if (useSocket) {
-            /**
-             * TODO(opt): do not use global
-             */
-            Object.defineProperty(global, 'USE_SOCKET', {
-                get: function () { return true; }
-            });
-            console.log('');
-            console.log('\x1b[33m%s\x1b[0m', '    WARNING: BootstrapConfig.useSocket is a highly experimental feature. Do not rely on it in production.');
-            console.log('');
-            /** @experimental */
-            /** @deprecated */
-            server = uws.http.createServer(function (req, res) { return route_stack_1.RouteStack.matchRequest(req, res); });
-        }
-        else {
-            /**
-             * TODO(opt): do not use global
-             */
-            Object.defineProperty(global, 'USE_SOCKET', {
-                get: function () { return false; }
-            });
-            server = http.createServer(function (req, res) { return route_stack_1.RouteStack.matchRequest(req, res); });
-        }
-        /**
-         * TODO(opt): Return as promise / callback
-         * So the user knows for sure when microdose is up and running
-         */
-        server.listen(port, function () { return credits_1.microCredits(port); });
-    };
-    if (clusterize) {
-        /**
-         * TODO(opt): We might want remove this from the core of microdose and
-         * TODO(opt): leave it to the developer?
-         */
-        startCluster(bootStrap);
+    var topRoutes = router_1.PartyRouterStack.find(function (_stack) { return _stack.routerName === serverApp.name; });
+    if (!topRoutes) {
+        console.log('WARNING: No root handlers found. If you intended not to add any RouterStack' +
+            'items to the main Router, ignore this message.');
     }
     else {
-        bootStrap();
+        route_stack_1.RouteStack.addStack.apply(route_stack_1.RouteStack, topRoutes.routerStack);
     }
+    var server = config.server.createServer(function (req, res) { return route_stack_1.RouteStack.matchRequest(req, res); });
+    /**
+     * TODO(opt): Return as promise / callback
+     * So the user knows for sure when microdose is up and running
+     */
+    server.listen(config.port, function () {
+        if (process.env.NODE_ENV === 'development') {
+            credits_1.microCredits(config.port);
+            if (config.liteMode) {
+                console.log('');
+                console.log('\x1b[33m%s\x1b[0m', 'WARNING: LiteMode is enabled. Path matching is disabled and' +
+                    'request will only match request methods.\n');
+            }
+        }
+        cb && cb();
+    });
 };
 //# sourceMappingURL=bootstrap.js.map

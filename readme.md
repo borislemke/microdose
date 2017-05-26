@@ -63,9 +63,10 @@ MicroBootstrap(MicroApp)
 ```
 ### microdose with uWebSocket(**Highly Experimental**)
 ```
-...same as above except for the BootstrapConfig param
+...pass `uws` as the bootstrapping server
+const uws = require('uws')
 
-MicroBootstrap(MicroApp, {useSocket: true})
+MicroBootstrap(MicroApp, {server: uws})
 ```
 
 ### Pure Node.js

@@ -7,13 +7,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require(".");
-// import * as bodyParser from 'body-parser'
 var ServerApp = (function () {
     function ServerApp() {
     }
     ServerApp.prototype.helloWorld = function (req, res) {
-        // console.log('req.params.userId\n', req.params.userId)
-        res.send('Hello ' + req.params.userId);
+        res.send('Hello World');
     };
     ServerApp.prototype.addHello = function (req, res) {
         res.send(req.body);
@@ -32,7 +30,7 @@ var ServerApp = (function () {
     return ServerApp;
 }());
 __decorate([
-    _1.MicroMethod.Get('/users/:userId')
+    _1.MicroMethod.Get('/users')
 ], ServerApp.prototype, "helloWorld", null);
 __decorate([
     _1.MicroMethod.Post()
@@ -47,12 +45,10 @@ __decorate([
     _1.MicroMethod.Delete()
 ], ServerApp.prototype, "forgetMeNot", null);
 ServerApp = __decorate([
-    _1.MicroRouter({})
+    _1.MicroRouter()
 ], ServerApp);
 _1.MicroBootstrap(ServerApp, {
     port: 3000,
-    cluster: false,
-    useSocket: false,
-    liteMode: false
+    liteMode: true
 });
 //# sourceMappingURL=_example.js.map

@@ -1,53 +1,40 @@
-import * as os from 'os'
-import * as uws from 'uws'
 import * as http from 'http'
-import * as cluster from 'cluster'
 import {RouteStack} from './route_stack'
 
 import {microCredits} from './utils/credits'
 import {PartyRouterStack} from './router'
-const numCPUs = os.cpus().length
 
 export interface BootstrapConfig {
     port?: number
-    cluster?: boolean
-    useSocket?: boolean
     liteMode?: boolean
+    server?: any
 }
 
-function startCluster(bootStrap: Function) {
-
-    if (cluster.isMaster) {
-
-        console.log(`Master ${process.pid} is running`)
-
-        for (let i = 0; i < numCPUs; i++) {
-            cluster.fork()
-        }
-
-        cluster.on('exit', (worker, code, signal) => {
-            console.log(`worker ${worker.process.pid} died`)
-        })
-    }
-
-    if (cluster.isWorker) {
-
-        console.log(`Worker ${process.pid} started`)
-
-        bootStrap()
-    }
-}
-
-export const MicroBootstrap = (serverApp, config?: BootstrapConfig | number) => {
-
-    let port
-
-    let clusterize = false
+export const MicroBootstrap = (serverApp, config?: BootstrapConfig | number, cb?: (err?: any) => void) => {
 
     if (typeof config === 'object') {
-        port = config.port
-        clusterize = config.cluster
+
+        // Default port if not provided
+        config.port || (config.port = 3000)
+
+        // Default server if not provided
+        config.server || (config.server = http)
+
         if (config.liteMode) {
+
+            /**
+             * Checks if the developer is attempting to use path patterns
+             * despite enabling lite mode.
+             */
+            PartyRouterStack.forEach(_stack => {
+                const conflictingPathUse = _stack.routerStack.find(_childStack => _childStack.path)
+                if (conflictingPathUse) {
+                    console.log('')
+                    console.log('\x1b[33m%s\x1b[0m', 'WARNING: Handler with path pattern ' + conflictingPathUse.path
+                        + ' will be ignored in Lite Mode.\n')
+                }
+            })
+
             /**
              * TODO(global): Do not use global namespace
              * @date - 5/26/17
@@ -56,81 +43,53 @@ export const MicroBootstrap = (serverApp, config?: BootstrapConfig | number) => 
             Object.defineProperty(global, 'LITE_MODE', {
                 get: () => true
             })
-
-            console.log('')
-            console.log('    LiteMode is enabled. Fasten your seat belts.')
-            console.log('')
         }
     }
 
+    // Config passed as number, perceive as port argument
     if (typeof config === 'number') {
-        port = (config as number)
+        config = {
+            server: http,
+            port: config
+        }
     }
 
+    // No config given, assign default port
     if (typeof config === 'undefined') {
-        port = 3000
+        config = {
+            port: 3000,
+            server: http
+        }
     }
 
-    port || (port = 3000)
+    const topRoutes = PartyRouterStack.find(_stack => _stack.routerName === serverApp.name)
 
-    const bootStrap = () => {
-
-        const topRoutes = PartyRouterStack.find(_stack => _stack.routerName === serverApp.name)
-
-        if (!topRoutes) {
-            console.log('WARNING: No root handlers found. If you intended not to add any RouterStack items to the main Router, ignore this message.')
-        } else {
-            RouteStack.addStack(...topRoutes.routerStack)
-        }
-
-        const useSocket = config && (config as BootstrapConfig).useSocket
-
-        let server
-
-        /** TODO(opt): Optimize statement */
-        if (useSocket) {
-
-            /**
-             * TODO(opt): do not use global
-             */
-            Object.defineProperty(global, 'USE_SOCKET', {
-                get: () => true
-            })
-
-            console.log('')
-            console.log('\x1b[33m%s\x1b[0m', '    WARNING: BootstrapConfig.useSocket is a highly experimental feature. Do not rely on it in production.')
-            console.log('')
-
-            /** @experimental */
-            /** @deprecated */
-            server = uws.http.createServer((req, res) => RouteStack.matchRequest(req, res))
-
-        } else {
-
-            /**
-             * TODO(opt): do not use global
-             */
-            Object.defineProperty(global, 'USE_SOCKET', {
-                get: () => false
-            })
-
-            server = http.createServer((req, res) => RouteStack.matchRequest(req, res))
-        }
-
-        /**
-         * TODO(opt): Return as promise / callback
-         * So the user knows for sure when microdose is up and running
-         */
-        server.listen(port, () => microCredits(port))
-    }
-
-    if (clusterize) {
-        /**
-         * TODO(opt): We might want remove this from the core of microdose and
-         * TODO(opt): leave it to the developer?
-         */
-        startCluster(bootStrap)
+    if (!topRoutes) {
+        console.log('WARNING: No root handlers found. If you intended not to add any RouterStack' +
+            'items to the main Router, ignore this message.')
     } else {
-        bootStrap()
+        RouteStack.addStack(...topRoutes.routerStack)
     }
+
+    const server = (config as BootstrapConfig).server.createServer((req, res) => RouteStack.matchRequest(req, res))
+
+    /**
+     * TODO(opt): Return as promise / callback
+     * So the user knows for sure when microdose is up and running
+     */
+    server.listen(config.port, () => {
+
+        if (process.env.NODE_ENV === 'development') {
+
+            microCredits((config as BootstrapConfig).port)
+
+            if ((config as BootstrapConfig).liteMode) {
+                console.log('')
+                console.log('\x1b[33m%s\x1b[0m', 'WARNING: LiteMode is enabled. Path matching is disabled and' +
+                    'request will only match request methods.\n')
+            }
+        }
+
+        cb && cb()
+    })
 }

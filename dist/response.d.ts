@@ -10,7 +10,7 @@ export declare class MicroResponseBuilder {
     /**
      * Reference to the original Node ServerResponse object
      */
-    native: ServerResponse;
+    nativeResponse: ServerResponse;
     /**
      * Default response status code
      * @type {number}
@@ -26,7 +26,7 @@ export declare class MicroResponseBuilder {
     constructor(_res: ServerResponse);
     static create(res: ServerResponse): MicroResponse;
     /**
-     * Set header values for the response to be sent
+     * Set header values for the response to be sent. This is just
      * @param key
      * @param value
      */

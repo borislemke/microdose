@@ -13,7 +13,7 @@ export class MicroResponseBuilder {
     /**
      * Reference to the original Node ServerResponse object
      */
-    native: ServerResponse
+    nativeResponse: ServerResponse
 
     /**
      * Default response status code
@@ -27,36 +27,35 @@ export class MicroResponseBuilder {
      * @type {ResponseHeaders}
      * @private
      */
-    private _responseHeaders = {
+    private _responseHeaders: ResponseHeaders = {
         'Content-Type': 'text/plain; charset=utf-8'
     }
 
     constructor(_res: ServerResponse) {
-        this.native = _res
+        this.nativeResponse = _res
     }
 
     public static create(res: ServerResponse): MicroResponse {
 
+        // Extended response object
         const microResponse = new MicroResponseBuilder(res)
 
-        /**
-         * Merge ServerResponse with original MicroResponse
-         */
-        for (let meth in microResponse) {
-            res[meth] = microResponse[meth]
+        // Merge properties of ServerResponse with MicroResponse
+        for (let method in microResponse) {
+            res[method] = microResponse[method]
         }
 
         return (res as MicroResponse)
     }
 
     /**
-     * Set header values for the response to be sent
+     * Set header values for the response to be sent. This is just
      * @param key
      * @param value
      */
-    set(key: string, value: string): void {
+    public set(key: string, value: string): void {
 
-        this.native.setHeader(key, value)
+        this.nativeResponse.setHeader(key, value)
     }
 
     /**
@@ -64,8 +63,9 @@ export class MicroResponseBuilder {
      * @param statusCode
      * @returns {MicroResponse}
      */
-    status(statusCode: HTTPStatusCodes): MicroResponse {
+    public status(statusCode: HTTPStatusCodes): MicroResponse {
 
+        // Sets the status code of the next response
         this._statusCode = statusCode
 
         // Force type assertion as TS does not understand
@@ -75,28 +75,25 @@ export class MicroResponseBuilder {
 
     public send(payload?: any): void {
 
+        // Determine what the final payload should be
+        // by analyzing it's type
         const payloadType = typeof payload
 
+        // Convert payload to string if type is of Object
         if (payloadType === 'object') {
             payload = JSON.stringify(payload)
         }
 
-        payload = payload && Buffer.from(payload)
+        // Provide fallback content
+        payload = payload || ''
 
-        payload || (payload = 'undefined')
+        // Provide Content-Length header value
+        this.nativeResponse.setHeader('Content-Length', payload.length)
 
-        this.native.setHeader('Content-Length', payload.length)
+        // Write response headers to be sent
+        this.nativeResponse.writeHead(this._statusCode, this._responseHeaders)
 
-        /**
-         * TODO(experimental): Optimize
-         * @date - 5/25/17
-         * @time - 2:32 AM
-         */
-        if (!global['USE_SOCKET']) {
-
-            this.native.writeHead(this._statusCode, this._responseHeaders)
-        }
-
-        this.native.end(payload)
+        // End connection and send off payload
+        this.nativeResponse.end(Buffer.from(payload))
     }
 }

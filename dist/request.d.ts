@@ -8,9 +8,9 @@ export interface MicroRequest extends IncomingMessage, MicroRequestBuilder {
  */
 export declare class MicroRequestBuilder {
     /**
-     * Reference to the native Node IncomingMessage
+     * Reference to the nativeResponse Node IncomingMessage
      */
-    native: IncomingMessage;
+    nativeRequest: IncomingMessage;
     /**
      * Injected object from a request payload
      * e.g @MicroMethod.Post('/users') -> POST http://hostname/users {"user_name": "user", "password": "1234"}

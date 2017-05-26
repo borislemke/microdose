@@ -31,21 +31,19 @@ var MicroRequestBuilder = (function () {
          * @type {{}}
          */
         this.params = {};
-        this.native = request;
+        this.nativeRequest = request;
     }
     MicroRequestBuilder.create = function (req) {
         var _microRequest = new MicroRequestBuilder(req);
         /**
-         * OPT1
-         * Merges properties of IncomingMessage with MicroRequest
+         * TODO(opt): Benchmark these
+         * @date - 5/26/17
+         * @time - 2:09 PM
          */
-        for (var meth in _microRequest) {
-            /**
-             * TODO(opt): Benchmark these
-             * @date - 5/26/17
-             * @time - 2:09 PM
-             */
-            req[meth] = _microRequest[meth];
+        // OPT1
+        // Merges properties of IncomingMessage with MicroRequest
+        for (var method in _microRequest) {
+            req[method] = _microRequest[method];
         }
         /* OPT2
          req = {
@@ -66,7 +64,7 @@ var MicroRequestBuilder = (function () {
     MicroRequestBuilder.prototype.get = function (key) {
         // Look up for a matching key value in the headers first
         // before looking up inside the request scoped `local` Object
-        return this.native.headers(key) || this.local[key] || null;
+        return this.nativeRequest.headers(key) || this.local[key] || null;
     };
     return MicroRequestBuilder;
 }());

@@ -1,7 +1,6 @@
 export interface BootstrapConfig {
     port?: number;
-    cluster?: boolean;
-    useSocket?: boolean;
     liteMode?: boolean;
+    server?: any;
 }
-export declare const MicroBootstrap: (serverApp: any, config?: number | BootstrapConfig) => void;
+export declare const MicroBootstrap: (serverApp: any, config?: number | BootstrapConfig, cb?: (err?: any) => void) => void;

@@ -16,25 +16,24 @@ var MicroResponseBuilder = (function () {
         this._responseHeaders = {
             'Content-Type': 'text/plain; charset=utf-8'
         };
-        this.native = _res;
+        this.nativeResponse = _res;
     }
     MicroResponseBuilder.create = function (res) {
+        // Extended response object
         var microResponse = new MicroResponseBuilder(res);
-        /**
-         * Merge ServerResponse with original MicroResponse
-         */
-        for (var meth in microResponse) {
-            res[meth] = microResponse[meth];
+        // Merge properties of ServerResponse with MicroResponse
+        for (var method in microResponse) {
+            res[method] = microResponse[method];
         }
         return res;
     };
     /**
-     * Set header values for the response to be sent
+     * Set header values for the response to be sent. This is just
      * @param key
      * @param value
      */
     MicroResponseBuilder.prototype.set = function (key, value) {
-        this.native.setHeader(key, value);
+        this.nativeResponse.setHeader(key, value);
     };
     /**
      * Sets the status code of the current response Object
@@ -42,28 +41,28 @@ var MicroResponseBuilder = (function () {
      * @returns {MicroResponse}
      */
     MicroResponseBuilder.prototype.status = function (statusCode) {
+        // Sets the status code of the next response
         this._statusCode = statusCode;
         // Force type assertion as TS does not understand
         // that the Object has been dynamically merged
         return this;
     };
     MicroResponseBuilder.prototype.send = function (payload) {
+        // Determine what the final payload should be
+        // by analyzing it's type
         var payloadType = typeof payload;
+        // Convert payload to string if type is of Object
         if (payloadType === 'object') {
             payload = JSON.stringify(payload);
         }
-        payload = payload && Buffer.from(payload);
-        payload || (payload = 'undefined');
-        this.native.setHeader('Content-Length', payload.length);
-        /**
-         * TODO(experimental): Optimize
-         * @date - 5/25/17
-         * @time - 2:32 AM
-         */
-        if (!global['USE_SOCKET']) {
-            this.native.writeHead(this._statusCode, this._responseHeaders);
-        }
-        this.native.end(payload);
+        // Provide fallback content
+        payload = payload || '';
+        // Provide Content-Length header value
+        this.nativeResponse.setHeader('Content-Length', payload.length);
+        // Write response headers to be sent
+        this.nativeResponse.writeHead(this._statusCode, this._responseHeaders);
+        // End connection and send off payload
+        this.nativeResponse.end(Buffer.from(payload));
     };
     return MicroResponseBuilder;
 }());

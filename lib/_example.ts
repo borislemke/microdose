@@ -5,10 +5,10 @@ import {
     MicroRequest,
     MicroBootstrap
 } from '.'
-// import * as bodyParser from 'body-parser'
+import * as bodyParser from 'body-parser'
 
 @MicroRouter({
-    // middleware: [bodyParser.json()]
+    middleware: [bodyParser.json()]
 })
 class ServerApp {
 
@@ -36,13 +36,13 @@ class ServerApp {
 
     @MicroMethod.Delete()
     forgetMeNot(req: MicroRequest, res: MicroResponse): void {
-        res.send(req.params.userName + ' is forever forgotten')
+        res.send('Deleted!')
     }
 }
 
 MicroBootstrap(ServerApp, {
     port: 3000,
-    cluster: true,
+    cluster: false,
     useSocket: false,
     liteMode: true
 })

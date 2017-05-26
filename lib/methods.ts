@@ -1,29 +1,30 @@
 import {MiddlewareFunction} from './middleware'
 import {PartyRouterStack} from './router'
 import {ensureURIValid} from './utils/ensure_url'
+import {StackItem} from './route_stack'
 
-const baseMethod = (method) => function (route?: string | Function, middleware?: MiddlewareFunction) {
+const baseMethod = (method) => function (methodPath?: string | Function, methodMiddleware?: MiddlewareFunction) {
 
     if (arguments.length > 2) {
         throw new Error('@MicroRouter[method] requires exactly 2 parameters. 3 given')
     }
 
     // case: @MicroRouter.Get()
-    if (typeof route === 'undefined' && typeof middleware === 'undefined') {
-        middleware = null
-        route = '/'
+    if (typeof methodPath === 'undefined' && typeof methodMiddleware === 'undefined') {
+        methodMiddleware = null
+        methodPath = '/'
     }
 
     // case: @MicroRouter.Get(middlewareFunction)
-    if (typeof route === 'function' && typeof middleware === 'undefined') {
-        middleware = (route as MiddlewareFunction)
-        route = '/'
+    if (typeof methodPath === 'function' && typeof methodMiddleware === 'undefined') {
+        methodMiddleware = (methodPath as MiddlewareFunction)
+        methodPath = '/'
     }
 
     // Ensures that the routerStack path is valid
     // e.g //some-path/that//is/not-valid/// -> /some-path/that/is/not-valid
     /** TODO(opt): We might need to allow this? */
-    route = ensureURIValid(route as string)
+    methodPath = ensureURIValid(methodPath as string)
 
     return function (target, descriptorKey: string, descriptor: any): any {
 
@@ -39,16 +40,16 @@ const baseMethod = (method) => function (route?: string | Function, middleware?:
             return _stack.routerName === target.constructor.name
         })
 
-        if (middleware) {
+        if (methodMiddleware) {
             const originalFunction = handler
             handler = (req, res) =>
-                middleware(req, res, (req2, res2) =>
+                methodMiddleware(req, res, (req2, res2) =>
                     originalFunction(req2 || req, res2 || res))
         }
 
-        const stackItem = {
+        const stackItem: StackItem = {
             method,
-            route: (route as string),
+            path: (methodPath as string),
             handler
         }
 

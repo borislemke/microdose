@@ -2,24 +2,24 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var router_1 = require("./router");
 var ensure_url_1 = require("./utils/ensure_url");
-var baseMethod = function (method) { return function (route, middleware) {
+var baseMethod = function (method) { return function (methodPath, methodMiddleware) {
     if (arguments.length > 2) {
         throw new Error('@MicroRouter[method] requires exactly 2 parameters. 3 given');
     }
     // case: @MicroRouter.Get()
-    if (typeof route === 'undefined' && typeof middleware === 'undefined') {
-        middleware = null;
-        route = '/';
+    if (typeof methodPath === 'undefined' && typeof methodMiddleware === 'undefined') {
+        methodMiddleware = null;
+        methodPath = '/';
     }
     // case: @MicroRouter.Get(middlewareFunction)
-    if (typeof route === 'function' && typeof middleware === 'undefined') {
-        middleware = route;
-        route = '/';
+    if (typeof methodPath === 'function' && typeof methodMiddleware === 'undefined') {
+        methodMiddleware = methodPath;
+        methodPath = '/';
     }
     // Ensures that the routerStack path is valid
     // e.g //some-path/that//is/not-valid/// -> /some-path/that/is/not-valid
     /** TODO(opt): We might need to allow this? */
-    route = ensure_url_1.ensureURIValid(route);
+    methodPath = ensure_url_1.ensureURIValid(methodPath);
     return function (target, descriptorKey, descriptor) {
         // Clone original handler function
         var handler = descriptor.value;
@@ -28,17 +28,17 @@ var baseMethod = function (method) { return function (route, middleware) {
             indexOfPartyStack = index;
             return _stack.routerName === target.constructor.name;
         });
-        if (middleware) {
+        if (methodMiddleware) {
             var originalFunction_1 = handler;
             handler = function (req, res) {
-                return middleware(req, res, function (req2, res2) {
+                return methodMiddleware(req, res, function (req2, res2) {
                     return originalFunction_1(req2 || req, res2 || res);
                 });
             };
         }
         var stackItem = {
             method: method,
-            route: route,
+            path: methodPath,
             handler: handler
         };
         if (!existingPartyStack) {

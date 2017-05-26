@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require(".");
-// import * as bodyParser from 'body-parser'
+var bodyParser = require("body-parser");
 var ServerApp = (function () {
     function ServerApp() {
     }
@@ -26,7 +26,7 @@ var ServerApp = (function () {
         res.send(req.body.patch_name);
     };
     ServerApp.prototype.forgetMeNot = function (req, res) {
-        res.send(req.params.userName + ' is forever forgotten');
+        res.send('Deleted!');
     };
     return ServerApp;
 }());
@@ -46,11 +46,13 @@ __decorate([
     _1.MicroMethod.Delete()
 ], ServerApp.prototype, "forgetMeNot", null);
 ServerApp = __decorate([
-    _1.MicroRouter({})
+    _1.MicroRouter({
+        middleware: [bodyParser.json()]
+    })
 ], ServerApp);
 _1.MicroBootstrap(ServerApp, {
     port: 3000,
-    cluster: true,
+    cluster: false,
     useSocket: false,
     liteMode: true
 });

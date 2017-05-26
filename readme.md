@@ -142,4 +142,4 @@ npm start
 Visit `http://localhost:3000` to see `Hello World`.
 
 ## Future
-- Replace `path-to-regexp` with simpler custom alternative
+ - [x] Replace `path-to-regexp` with simpler custom alternative

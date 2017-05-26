@@ -4,12 +4,12 @@ var parseUrl = require("parseurl");
 var response_1 = require("./response");
 var request_1 = require("./request");
 var status_codes_1 = require("./status_codes");
-var pathToRegexp = require('path-to-regexp');
 var RouteStackCompiler = (function () {
     function RouteStackCompiler() {
         /**
          * All path stack collected from the MicroMethod decorator will
-         * end up here to be path-matched for each incoming request
+         * end up here to be path-matched for each incoming request.
+         * Filtering by method first has significant performance impact
          * @type {RouteStackGroup[]}
          * @private
          */
@@ -48,6 +48,11 @@ var RouteStackCompiler = (function () {
          */
         var liteMode = typeof global['LITE_MODE'] !== 'undefined' && global['LITE_MODE'];
         var incomingRequestRoute = parseUrl(req).pathname;
+        if (incomingRequestRoute.includes('favicon')) {
+            res.writeHead(204, { 'Content-Type': 'plain/text' });
+            res.end();
+            return;
+        }
         var matchingRoutesStack = this._routeStack[req.method];
         // If LITE_MODE is enabled, we only need to match the method as there
         // can only be a single instance for each method
@@ -62,6 +67,9 @@ var RouteStackCompiler = (function () {
         var routeMatch;
         // Found parameters inside path path
         var params = {};
+        // Incoming request URL split by slashes. Used for path matching later
+        // e.g /users/userName => ['users', 'username']
+        var pathChunks = incomingRequestRoute.replace(/^\/+|\/+^/, '').split('/');
         for (var i = 0; i < matchingRoutesStack.length; i++) {
             // The currently iterated routerName stack
             var curr = matchingRoutesStack[i];
@@ -76,22 +84,38 @@ var RouteStackCompiler = (function () {
             // e.g @MicroMethod.Post('/users/:userId') or ('/foo*')
             if (!/\/?:(.*)|\*/g.test(curr.path))
                 continue;
-            // MicroRequest should bind params data to the request
-            // e.g req.params.userId = `value of :userId`
-            /** TODO(perf): offload path matching to C module */
-            var reg = pathToRegexp(curr.path);
-            // Tries to look up a match to the incoming request's URL
-            var regExec = reg.exec(incomingRequestRoute);
-            // If no match found, return immediately
-            if (!regExec)
+            var matchChunks = curr.path.replace(/^\/+|\/+^/, '').split('/');
+            // Continue loop early if request URL and currently iterated
+            // router stack does not match in chunks length
+            if (pathChunks.length !== matchChunks.length)
                 continue;
-            for (var i_1 = 0; i_1 < reg.keys.length; i_1++) {
-                var matchValue = regExec[i_1 + 1];
-                var matchKey = reg.keys[i_1].name;
-                // Assign the matching parameters to the params object
-                // to be passed on to the MicroResponse
-                params[matchKey] = matchValue;
+            for (var i_1 = 0; i_1 < matchChunks.length; i_1++) {
+                var capture = matchChunks[i_1];
+                if (/^:/.test(capture)) {
+                    params[capture.replace(/^:/i, '')] = pathChunks[i_1];
+                }
             }
+            /*
+             // REMOVE path-to-regex
+             // MicroRequest should bind params data to the request
+             // e.g req.params.userId = `value of :userId`
+             // TODO(perf): offload path matching to C module
+             const reg = pathToRegexp(curr.path)
+
+             // Tries to look up a match to the incoming request's URL
+             const regExec = reg.exec(incomingRequestRoute)
+
+             // If no match found, return immediately
+             if (!regExec) continue
+
+             for (let i = 0; i < reg.keys.length; i++) {
+             const matchValue = regExec[i + 1]
+             const matchKey = reg.keys[i].name
+             // Assign the matching parameters to the params object
+             // to be passed on to the MicroResponse
+             params[matchKey] = matchValue
+             }
+             */
             // If any matching params were found
             // mark the currently iterated routerStack as a match
             // and break out of the loop

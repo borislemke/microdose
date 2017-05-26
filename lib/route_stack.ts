@@ -3,7 +3,6 @@ import {MicroResponse, MicroResponseBuilder} from './response'
 import {MicroRequest, MicroRequestBuilder} from './request'
 import {IncomingMessage, ServerResponse} from 'http'
 import {HTTPStatusCodes} from './status_codes'
-const pathToRegexp = require('path-to-regexp')
 
 export interface StackItem {
     path: string
@@ -19,7 +18,8 @@ export class RouteStackCompiler {
 
     /**
      * All path stack collected from the MicroMethod decorator will
-     * end up here to be path-matched for each incoming request
+     * end up here to be path-matched for each incoming request.
+     * Filtering by method first has significant performance impact
      * @type {RouteStackGroup[]}
      * @private
      */
@@ -61,6 +61,12 @@ export class RouteStackCompiler {
 
         const incomingRequestRoute = parseUrl(req).pathname
 
+        if (incomingRequestRoute.includes('favicon')) {
+            res.writeHead(204, {'Content-Type': 'plain/text'})
+            res.end()
+            return
+        }
+
         const matchingRoutesStack = this._routeStack[req.method]
 
         // If LITE_MODE is enabled, we only need to match the method as there
@@ -79,6 +85,10 @@ export class RouteStackCompiler {
         // Found parameters inside path path
         let params = {}
 
+        // Incoming request URL split by slashes. Used for path matching later
+        // e.g /users/userName => ['users', 'username']
+        const pathChunks = incomingRequestRoute.replace(/^\/+|\/+^/, '').split('/')
+
         for (let i = 0; i < matchingRoutesStack.length; i++) {
 
             // The currently iterated routerName stack
@@ -96,24 +106,42 @@ export class RouteStackCompiler {
             // e.g @MicroMethod.Post('/users/:userId') or ('/foo*')
             if (!/\/?:(.*)|\*/g.test(curr.path)) continue
 
-            // MicroRequest should bind params data to the request
-            // e.g req.params.userId = `value of :userId`
-            /** TODO(perf): offload path matching to C module */
-            const reg = pathToRegexp(curr.path)
+            const matchChunks = curr.path.replace(/^\/+|\/+^/, '').split('/')
 
-            // Tries to look up a match to the incoming request's URL
-            const regExec = reg.exec(incomingRequestRoute)
+            // Continue loop early if request URL and currently iterated
+            // router stack does not match in chunks length
+            if (pathChunks.length !== matchChunks.length) continue
 
-            // If no match found, return immediately
-            if (!regExec) continue
+            for (let i = 0; i < matchChunks.length; i++) {
 
-            for (let i = 0; i < reg.keys.length; i++) {
-                const matchValue = regExec[i + 1]
-                const matchKey = reg.keys[i].name
-                // Assign the matching parameters to the params object
-                // to be passed on to the MicroResponse
-                params[matchKey] = matchValue
+                const capture = matchChunks[i]
+
+                if (/^:/.test(capture)) {
+                    params[capture.replace(/^:/i, '')] = pathChunks[i]
+                }
             }
+
+            /*
+             // REMOVE path-to-regex
+             // MicroRequest should bind params data to the request
+             // e.g req.params.userId = `value of :userId`
+             // TODO(perf): offload path matching to C module
+             const reg = pathToRegexp(curr.path)
+
+             // Tries to look up a match to the incoming request's URL
+             const regExec = reg.exec(incomingRequestRoute)
+
+             // If no match found, return immediately
+             if (!regExec) continue
+
+             for (let i = 0; i < reg.keys.length; i++) {
+             const matchValue = regExec[i + 1]
+             const matchKey = reg.keys[i].name
+             // Assign the matching parameters to the params object
+             // to be passed on to the MicroResponse
+             params[matchKey] = matchValue
+             }
+             */
 
             // If any matching params were found
             // mark the currently iterated routerStack as a match

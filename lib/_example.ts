@@ -12,9 +12,10 @@ import {
 })
 class ServerApp {
 
-    @MicroMethod.Get()
+    @MicroMethod.Get('/users/:userId')
     helloWorld(req: MicroRequest, res: MicroResponse): void {
-        res.send('Hello World')
+        // console.log('req.params.userId\n', req.params.userId)
+        res.send('Hello ' + req.params.userId)
     }
 
     @MicroMethod.Post()

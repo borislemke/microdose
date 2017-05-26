@@ -12,7 +12,8 @@ var ServerApp = (function () {
     function ServerApp() {
     }
     ServerApp.prototype.helloWorld = function (req, res) {
-        res.send('Hello World');
+        // console.log('req.params.userId\n', req.params.userId)
+        res.send('Hello ' + req.params.userId);
     };
     ServerApp.prototype.addHello = function (req, res) {
         res.send(req.body);
@@ -31,7 +32,7 @@ var ServerApp = (function () {
     return ServerApp;
 }());
 __decorate([
-    _1.MicroMethod.Get()
+    _1.MicroMethod.Get('/users/:userId')
 ], ServerApp.prototype, "helloWorld", null);
 __decorate([
     _1.MicroMethod.Post()

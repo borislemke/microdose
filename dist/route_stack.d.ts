@@ -13,7 +13,8 @@ export interface RouteStackGroup {
 export declare class RouteStackCompiler {
     /**
      * All path stack collected from the MicroMethod decorator will
-     * end up here to be path-matched for each incoming request
+     * end up here to be path-matched for each incoming request.
+     * Filtering by method first has significant performance impact
      * @type {RouteStackGroup[]}
      * @private
      */

@@ -1,6 +1,6 @@
 {
   "name": "microdose",
-  "version": "0.6.39",
+  "version": "0.6.40",
   "description": "A light-weight TypeScript web framework for Node with minimum external dependencies.",
   "homepage": "https://borislemke.gitbooks.io/microdose/content/",
   "keywords": [
@@ -14,12 +14,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "npm run build",
+    "start": "npm run dev",
     "prebuild": "npm run clean",
-    "build": "concurrently \"npm run compile\" \"npm run serve\" ",
+    "build": "npm run compile:prod",
+    "predev": "npm run clean",
+    "dev": "concurrently \"npm run compile\" \"npm run serve\" ",
     "preclean": "npm run rimraf -- dist-test",
     "clean": "npm run rimraf -- dist",
     "rimraf": "rimraf",
+    "compile:prod": "tsc -p tsconfig.json",
     "compile": "tsc --watch -p tsconfig.json",
     "postcompile": "wait-on dist/index.js && npm run serve",
     "serve": "wait-on dist/_example.js && nodemon dist/_example.js",
@@ -45,6 +48,7 @@
     "tslint": "^5.3.2",
     "tslint-config-standard": "^5.0.2",
     "typescript": "^2.3.2",
+    "uws": "^0.14.5",
     "wait-on": "^2.0.2"
   },
   "dependencies": {

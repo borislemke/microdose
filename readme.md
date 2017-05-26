@@ -66,7 +66,7 @@ MicroBootstrap(MicroApp)
 ...pass `uws` as the bootstrapping server
 const uws = require('uws')
 
-MicroBootstrap(MicroApp, {server: uws})
+MicroBootstrap(MicroApp, {server: uws.http})
 ```
 
 ### Pure Node.js

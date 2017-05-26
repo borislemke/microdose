@@ -57,10 +57,9 @@ var MicroResponseBuilder = (function () {
         }
         // Provide fallback content
         payload = payload || '';
+        var contentLength = payload.length;
         // Provide Content-Length header value
-        this.nativeResponse.setHeader('Content-Length', payload.length);
-        // Write response headers to be sent
-        this.nativeResponse.writeHead(this._statusCode, this._responseHeaders);
+        this.nativeResponse.setHeader('Content-Length', contentLength);
         // End connection and send off payload
         this.nativeResponse.end(Buffer.from(payload));
     };

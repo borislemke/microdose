@@ -62,7 +62,7 @@ export class RouteStackCompiler {
          * @date - 5/26/17
          * @time - 12:14 PM
          */
-        const liteMode: boolean = typeof global['LITE_MODE'] !== 'undefined' && global['LITE_MODE']
+        const turboMode: boolean = typeof global['TURBO_MODE'] !== 'undefined' && global['TURBO_MODE']
 
         // The URL of the current request
         const incomingRequestPath = parseUrl(req).pathname
@@ -86,17 +86,17 @@ export class RouteStackCompiler {
             return
         }
 
-        // If LITE_MODE is enabled, we only need to match the method as there can
+        // If TURBO_MODE is enabled, we only need to match the method as there can
         // only be a single instance for each method. Path matching is disabled
-        if (liteMode) {
+        if (turboMode) {
             const mResponse = MicroResponseBuilder.create(res)
             const mRequest = MicroRequestBuilder.create(req)
             // Retrieve first handler of the matching router stack
             matchingRoutesStack[0].handler(mRequest, mResponse)
-            // There can only be 1 handler per method if on liteMode
+            // There can only be 1 handler per method if on turboMode
             if (matchingRoutesStack.length > 1) {
                 console.log('')
-                console.log('\x1b[33m%s\x1b[0m', `WARNING: 'liteMode' is enable but microdose detected multiple
+                console.log('\x1b[33m%s\x1b[0m', `WARNING: 'Turbo Mode' is enable but microdose detected multiple
                 handlers for ${req.method} requests.\n`)
             }
             return

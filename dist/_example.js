@@ -49,6 +49,6 @@ ServerApp = __decorate([
 ], ServerApp);
 _1.MicroBootstrap(ServerApp, {
     port: 3000,
-    liteMode: true
+    turboMode: true
 });
 //# sourceMappingURL=_example.js.map

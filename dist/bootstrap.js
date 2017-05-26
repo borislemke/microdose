@@ -10,17 +10,17 @@ exports.MicroBootstrap = function (serverApp, config, cb) {
         config.port || (config.port = 3000);
         // Default server if not provided
         config.server || (config.server = http);
-        if (config.liteMode) {
+        if (config.turboMode) {
             /**
              * Checks if the developer is attempting to use path patterns
-             * despite enabling lite mode.
+             * despite enabling Turbo Mode.
              */
             router_1.PartyRouterStack.forEach(function (_stack) {
                 var conflictingPathUse = _stack.routerStack.find(function (_childStack) { return _childStack.path; });
                 if (conflictingPathUse) {
                     console.log('');
                     console.log('\x1b[33m%s\x1b[0m', 'WARNING: Handler with path pattern ' + conflictingPathUse.path
-                        + ' will be ignored in Lite Mode.\n');
+                        + ' will be ignored in Turbo Mode.\n');
                 }
             });
             /**
@@ -28,7 +28,7 @@ exports.MicroBootstrap = function (serverApp, config, cb) {
              * @date - 5/26/17
              * @time - 12:10 PM
              */
-            Object.defineProperty(global, 'LITE_MODE', {
+            Object.defineProperty(global, 'TURBO_MODE', {
                 get: function () { return true; }
             });
         }
@@ -63,10 +63,10 @@ exports.MicroBootstrap = function (serverApp, config, cb) {
     server.listen(config.port, function () {
         if (process.env.NODE_ENV === 'development') {
             credits_1.microCredits(config.port);
-            if (config.liteMode) {
+            if (config.turboMode) {
                 console.log('');
-                console.log('\x1b[33m%s\x1b[0m', 'WARNING: LiteMode is enabled. Path matching is disabled and' +
-                    'request will only match request methods.\n');
+                console.log('\x1b[33m%s\x1b[0m', 'WARNING: Turbo Mode is enabled. Path matching is disabled and' +
+                    ' request will only match request methods.\n');
             }
         }
         cb && cb();

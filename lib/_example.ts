@@ -39,5 +39,5 @@ class ServerApp {
 
 MicroBootstrap(ServerApp, {
     port: 3000,
-    liteMode: true
+    turboMode: true
 })

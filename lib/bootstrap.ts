@@ -6,7 +6,7 @@ import {PartyRouterStack} from './router'
 
 export interface BootstrapConfig {
     port?: number
-    liteMode?: boolean
+    turboMode?: boolean
     server?: any
 }
 
@@ -20,18 +20,18 @@ export const MicroBootstrap = (serverApp, config?: BootstrapConfig | number, cb?
         // Default server if not provided
         config.server || (config.server = http)
 
-        if (config.liteMode) {
+        if (config.turboMode) {
 
             /**
              * Checks if the developer is attempting to use path patterns
-             * despite enabling lite mode.
+             * despite enabling Turbo Mode.
              */
             PartyRouterStack.forEach(_stack => {
                 const conflictingPathUse = _stack.routerStack.find(_childStack => _childStack.path)
                 if (conflictingPathUse) {
                     console.log('')
                     console.log('\x1b[33m%s\x1b[0m', 'WARNING: Handler with path pattern ' + conflictingPathUse.path
-                        + ' will be ignored in Lite Mode.\n')
+                        + ' will be ignored in Turbo Mode.\n')
                 }
             })
 
@@ -40,7 +40,7 @@ export const MicroBootstrap = (serverApp, config?: BootstrapConfig | number, cb?
              * @date - 5/26/17
              * @time - 12:10 PM
              */
-            Object.defineProperty(global, 'LITE_MODE', {
+            Object.defineProperty(global, 'TURBO_MODE', {
                 get: () => true
             })
         }
@@ -83,10 +83,10 @@ export const MicroBootstrap = (serverApp, config?: BootstrapConfig | number, cb?
 
             microCredits((config as BootstrapConfig).port)
 
-            if ((config as BootstrapConfig).liteMode) {
+            if ((config as BootstrapConfig).turboMode) {
                 console.log('')
-                console.log('\x1b[33m%s\x1b[0m', 'WARNING: LiteMode is enabled. Path matching is disabled and' +
-                    'request will only match request methods.\n')
+                console.log('\x1b[33m%s\x1b[0m', 'WARNING: Turbo Mode is enabled. Path matching is disabled and' +
+                    ' request will only match request methods.\n')
             }
         }
 

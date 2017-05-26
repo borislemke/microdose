@@ -7,6 +7,9 @@ export interface ResponseHeaders {
     [key: string]: string;
 }
 export declare class MicroResponseBuilder {
+    /**
+     * Reference to the original Node ServerResponse object
+     */
     native: ServerResponse;
     /**
      * Default response status code
@@ -22,6 +25,11 @@ export declare class MicroResponseBuilder {
     private _responseHeaders;
     constructor(_res: ServerResponse);
     static create(res: ServerResponse): MicroResponse;
+    /**
+     * Set header values for the response to be sent
+     * @param key
+     * @param value
+     */
     set(key: string, value: string): void;
     /**
      * Sets the status code of the current response Object

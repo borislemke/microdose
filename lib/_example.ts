@@ -5,10 +5,10 @@ import {
     MicroRequest,
     MicroBootstrap
 } from '.'
-import * as bodyParser from 'body-parser'
+// import * as bodyParser from 'body-parser'
 
 @MicroRouter({
-    middleware: [bodyParser.json()]
+    // middleware: [bodyParser.json()]
 })
 class ServerApp {
 
@@ -17,7 +17,7 @@ class ServerApp {
         res.send('Hello World')
     }
 
-    @MicroMethod.Post()// microParser)
+    @MicroMethod.Post()
     addHello(req: MicroRequest, res: MicroResponse): void {
         res.send(req.body)
     }
@@ -44,5 +44,5 @@ MicroBootstrap(ServerApp, {
     port: 3000,
     cluster: false,
     useSocket: false,
-    liteMode: true
+    liteMode: false
 })

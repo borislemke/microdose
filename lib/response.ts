@@ -10,6 +10,9 @@ export interface ResponseHeaders {
 
 export class MicroResponseBuilder {
 
+    /**
+     * Reference to the original Node ServerResponse object
+     */
     native: ServerResponse
 
     /**
@@ -46,6 +49,11 @@ export class MicroResponseBuilder {
         return (res as MicroResponse)
     }
 
+    /**
+     * Set header values for the response to be sent
+     * @param key
+     * @param value
+     */
     set(key: string, value: string): void {
 
         this.native.setHeader(key, value)
@@ -60,7 +68,8 @@ export class MicroResponseBuilder {
 
         this._statusCode = statusCode
 
-        // Force type assertion as TS does not understand that the Object is dynamically merged
+        // Force type assertion as TS does not understand
+        // that the Object has been dynamically merged
         return ((this as any) as MicroResponse)
     }
 

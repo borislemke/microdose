@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _1 = require(".");
-var bodyParser = require("body-parser");
+// import * as bodyParser from 'body-parser'
 var ServerApp = (function () {
     function ServerApp() {
     }
@@ -34,7 +34,7 @@ __decorate([
     _1.MicroMethod.Get()
 ], ServerApp.prototype, "helloWorld", null);
 __decorate([
-    _1.MicroMethod.Post() // microParser)
+    _1.MicroMethod.Post()
 ], ServerApp.prototype, "addHello", null);
 __decorate([
     _1.MicroMethod.Put()
@@ -46,14 +46,12 @@ __decorate([
     _1.MicroMethod.Delete()
 ], ServerApp.prototype, "forgetMeNot", null);
 ServerApp = __decorate([
-    _1.MicroRouter({
-        middleware: [bodyParser.json()]
-    })
+    _1.MicroRouter({})
 ], ServerApp);
 _1.MicroBootstrap(ServerApp, {
     port: 3000,
     cluster: false,
     useSocket: false,
-    liteMode: true
+    liteMode: false
 });
 //# sourceMappingURL=_example.js.map

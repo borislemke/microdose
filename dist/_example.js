@@ -51,4 +51,8 @@ _1.MicroBootstrap(ServerApp, {
     port: 3000,
     turboMode: true
 });
+var kopf = ['`Kennung-Besonderer-Fall-Modellvorhaben'];
+console.log('\n-------------------------------------------\n');
+kopf[kopf.length - 1] += '` VARCHAR(255),\n';
+console.log(kopf[kopf.length - 1]);
 //# sourceMappingURL=_example.js.map

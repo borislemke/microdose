@@ -58,7 +58,7 @@ var RouteStackCompiler = (function () {
             return;
         }
         // If TURBO_MODE is enabled, we only need to match the method as there can
-        // only be a single instance for each method. Path matching is disabled
+        // only be a single handler function of each method. Path matching is disabled
         if (turboMode) {
             var mResponse_1 = response_1.MicroResponseBuilder.create(res);
             var mRequest_1 = request_1.MicroRequestBuilder.create(req);

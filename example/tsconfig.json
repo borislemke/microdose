@@ -1,13 +1,10 @@
 {
     "compilerOptions": {
-        // "baseUrl": ".",
         "declaration": true,
         "stripInternal": true,
         "experimentalDecorators": true,
         "module": "commonjs",
         "moduleResolution": "node",
-        "outDir": "./dist",
-        "rootDir": "./lib",
         "sourceMap": true,
         "inlineSources": true,
         "target": "es5",
@@ -17,12 +14,14 @@
             "dom"
         ],
         "typeRoots": [
-            "node_modules/@types"
+            "../node_modules/@types"
         ]
     },
     "exclude": [
-        "node_modules",
-        "dist",
-        "example"
+        "../node_modules",
+        "../dist"
+    ],
+    "files": [
+        "index.ts"
     ]
 }

@@ -5,7 +5,7 @@ var response_1 = require("./response");
 var request_1 = require("./request");
 var status_codes_1 = require("./status_codes");
 var earlyReturn = function (res) {
-    res.writeHead(status_codes_1.HTTPStatusCodes.NOT_FOUND, { 'Content-Type': 'plain/text' });
+    res.writeHead(status_codes_1.HTTPStatusCodes.NOT_FOUND, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
 };
 var RouteStackCompiler = (function () {

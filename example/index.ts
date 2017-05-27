@@ -4,7 +4,7 @@ import {
     MicroResponse,
     MicroRequest,
     MicroBootstrap
-} from '.'
+} from '../dist'
 
 @MicroRouter()
 class ServerApp {
@@ -16,6 +16,7 @@ class ServerApp {
 
     @MicroMethod.Post()
     addHello(req: MicroRequest, res: MicroResponse): void {
+        console.log('req.headers', req.headers)
         res.send(req.body)
     }
 
@@ -37,12 +38,6 @@ class ServerApp {
     }
 }
 
-MicroBootstrap(ServerApp, {
-    port: 3000,
-    turboMode: true
+MicroBootstrap(ServerApp, 3000, () => {
+    console.log('listening')
 })
-
-let kopf = ['`Kennung-Besonderer-Fall-Modellvorhaben']
-console.log('\n-------------------------------------------\n')
-kopf[kopf.length - 1] += '` VARCHAR(255),\n'
-console.log(kopf[kopf.length - 1])

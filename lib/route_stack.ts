@@ -15,7 +15,7 @@ export interface RouteStackGroup {
 }
 
 const earlyReturn = (res: ServerResponse) => {
-    res.writeHead(HTTPStatusCodes.NOT_FOUND, {'Content-Type': 'plain/text'})
+    res.writeHead(HTTPStatusCodes.NOT_FOUND, {'Content-Type': 'text/plain'})
     res.end('Not Found')
 }
 

@@ -6,7 +6,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var _1 = require(".");
+var dist_1 = require("../dist");
 var ServerApp = (function () {
     function ServerApp() {
     }
@@ -14,6 +14,7 @@ var ServerApp = (function () {
         res.send('Hello World');
     };
     ServerApp.prototype.addHello = function (req, res) {
+        console.log('req.headers', req.headers);
         res.send(req.body);
     };
     ServerApp.prototype.putToTheTest = function (req, res) {
@@ -30,29 +31,24 @@ var ServerApp = (function () {
     return ServerApp;
 }());
 __decorate([
-    _1.MicroMethod.Get('/users')
+    dist_1.MicroMethod.Get('/users')
 ], ServerApp.prototype, "helloWorld", null);
 __decorate([
-    _1.MicroMethod.Post()
+    dist_1.MicroMethod.Post()
 ], ServerApp.prototype, "addHello", null);
 __decorate([
-    _1.MicroMethod.Put()
+    dist_1.MicroMethod.Put()
 ], ServerApp.prototype, "putToTheTest", null);
 __decorate([
-    _1.MicroMethod.Patch()
+    dist_1.MicroMethod.Patch()
 ], ServerApp.prototype, "eyePath", null);
 __decorate([
-    _1.MicroMethod.Delete()
+    dist_1.MicroMethod.Delete()
 ], ServerApp.prototype, "forgetMeNot", null);
 ServerApp = __decorate([
-    _1.MicroRouter()
+    dist_1.MicroRouter()
 ], ServerApp);
-_1.MicroBootstrap(ServerApp, {
-    port: 3000,
-    turboMode: true
+dist_1.MicroBootstrap(ServerApp, 3000, function () {
+    console.log('listening');
 });
-var kopf = ['`Kennung-Besonderer-Fall-Modellvorhaben'];
-console.log('\n-------------------------------------------\n');
-kopf[kopf.length - 1] += '` VARCHAR(255),\n';
-console.log(kopf[kopf.length - 1]);
-//# sourceMappingURL=_example.js.map
+//# sourceMappingURL=index.js.map

@@ -36,6 +36,15 @@ var MicroResponseBuilder = (function () {
         this.nativeResponse.setHeader(key, value);
     };
     /**
+     * Sends an empty response with the response code only
+     * as the header
+     * @param statusCode
+     */
+    MicroResponseBuilder.prototype.sendStatus = function (statusCode) {
+        this.nativeResponse.writeHead(statusCode, { 'Content-Type': 'text/plain' });
+        this.nativeResponse.end();
+    };
+    /**
      * Sets the status code of the current response Object
      * @param statusCode
      * @returns {MicroResponse}

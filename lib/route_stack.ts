@@ -135,6 +135,7 @@ export class RouteStackCompiler {
             // router stack does not match in chunks length
             if (pathChunks.length !== matchChunks.length) continue
 
+            // Iterate over route patterns
             for (let i = 0; i < matchChunks.length; i++) {
 
                 const capture = matchChunks[i]
@@ -164,9 +165,8 @@ export class RouteStackCompiler {
             return
         }
 
+        // Create the request and response object only after a route match has been found
         const mResponse = MicroResponseBuilder.create(res)
-
-        // Create the request object only after a route match has been found
         const mRequest = MicroRequestBuilder.create(req)
 
         // Attach params to current request context

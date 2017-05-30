@@ -109,6 +109,7 @@ var RouteStackCompiler = (function () {
             // router stack does not match in chunks length
             if (pathChunks.length !== matchChunks.length)
                 continue;
+            // Iterate over route patterns
             for (var i_1 = 0; i_1 < matchChunks.length; i_1++) {
                 var capture = matchChunks[i_1];
                 if (/^:/.test(capture)) {
@@ -133,8 +134,8 @@ var RouteStackCompiler = (function () {
             earlyReturn(res);
             return;
         }
+        // Create the request and response object only after a route match has been found
         var mResponse = response_1.MicroResponseBuilder.create(res);
-        // Create the request object only after a route match has been found
         var mRequest = request_1.MicroRequestBuilder.create(req);
         // Attach params to current request context
         if (params)

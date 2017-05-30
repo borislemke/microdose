@@ -32,6 +32,12 @@ export declare class MicroResponseBuilder {
      */
     set(key: string, value: string): void;
     /**
+     * Sends an empty response with the response code only
+     * as the header
+     * @param statusCode
+     */
+    sendStatus(statusCode: number): void;
+    /**
      * Sets the status code of the current response Object
      * @param statusCode
      * @returns {MicroResponse}

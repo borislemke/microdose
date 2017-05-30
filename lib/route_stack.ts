@@ -15,7 +15,7 @@ export interface RouteStackGroup {
 }
 
 const earlyReturn = (res: ServerResponse) => {
-    res.writeHead(HTTPStatusCodes.NOT_FOUND, {'Content-Type': 'plain/text'})
+    res.writeHead(HTTPStatusCodes.NOT_FOUND, {'Content-Type': 'text/plain'})
     res.end('Not Found')
 }
 
@@ -73,7 +73,7 @@ export class RouteStackCompiler {
         }
 
         // If TURBO_MODE is enabled, we only need to match the method as there can
-        // only be a single instance for each method. Path matching is disabled
+        // only be a single handler function of each method. Path matching is disabled
         if (turboMode) {
             const mResponse = MicroResponseBuilder.create(res)
             const mRequest = MicroRequestBuilder.create(req)

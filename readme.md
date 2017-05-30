@@ -1,6 +1,9 @@
 # microdose
 A feather-light JavaScript API framework for Node, written 100% in TypeScript, built for micro-services. `microdose` is microdosing for servers.
 
+[![codebeat badge](https://codebeat.co/badges/7dc9fafc-ccbc-4204-8390-82393527a667)](https://codebeat.co/projects/github-com-borislemke-microdose-master)
+[![npm version](https://badge.fury.io/js/microdose.svg)](https://badge.fury.io/js/microdose)
+
 This project is in it's early design stages. Things will break and the syntax is changing rapidly. Contributions to the project is highly encouraged and appreciated.
 
 ## Documentation

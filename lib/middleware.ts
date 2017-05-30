@@ -9,4 +9,5 @@ export interface RequestHandler {
     (req: MicroRequest, res: MicroResponse, next?: NextFunction): void
 }
 
-export interface MiddlewareFunction extends RequestHandler {}
+export interface MiddlewareFunction extends RequestHandler {
+}

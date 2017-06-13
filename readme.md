@@ -38,7 +38,7 @@ MicroBootstrap(MyRouter, 3000)
 ## microdose vs other frameworks, the battle is on
 
 All benchmarked with `autocannon` with the following parameters:
-```
+```sh
 $ autocannon -p 10 -c 1000 -d 30 http://localhost:3000
 ```
 
@@ -124,7 +124,7 @@ Benchmark results:
 As you can see `microdose` tops the chart amongst other popular Node frameworks, `microdose+uWS` is even faster than pure Node.js(**double!**) but there are some challenges before we can make it reliable in production. `microdose+uWS` is deemed to stall as the developers of `uWebSocket` have no interest in further developing the `uws.http` module. See this issue: [Cash for Code](https://github.com/uNetworking/uWebSockets/issues/590#issuecomment-299608041)
 
 ## Installation
-```
+```sh
 $ npm install microdose
 ```
 
@@ -133,13 +133,13 @@ $ npm install microdose
 Clone the repo from `https://github.com/borislemke/microdose`.
 
 Install dependencies
-```
-npm install
+```sh
+$ npm install
 ```
 
 Run the example
-```
-npm start
+```sh
+$ npm start
 ```
 
 Visit `http://localhost:3000` to see `Hello World`.

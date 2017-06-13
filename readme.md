@@ -11,7 +11,7 @@ Documentation can be found on `microdose`'s [GitBooks](https://borislemke.gitboo
 
 ## Hello World
 *src/server.ts*
-```javascript
+```typescript
 import {
     MicroBootstrap,
     MicroRouter,
@@ -44,7 +44,7 @@ $ autocannon -p 10 -c 1000 -d 30 http://localhost:3000
 
 ### microdose
 
-```
+```typescript
 import {
     MicroBootstrap,
     MicroRouter,
@@ -65,15 +65,15 @@ export class MicroApp {
 MicroBootstrap(MicroApp)
 ```
 ### microdose with uWebSocket(**Highly Experimental**)
-```
-...pass `uws` as the bootstrapping server
+```typescript
+// ...pass `uws.http` as the bootstrapping server
 const uws = require('uws')
 
 MicroBootstrap(MicroApp, {server: uws.http})
 ```
 
 ### Pure Node.js
-```
+```typescript
 const http = require('http')
 
 http.createServer((req, res) => {
@@ -82,7 +82,7 @@ http.createServer((req, res) => {
 }).listen(3000)
 ```
 ### koa.js
-```
+```typescript
 const Koa = require('koa')
 const app = new Koa()
 
@@ -91,7 +91,7 @@ app.use(ctx => ctx.body = 'Hello World')
 app.listen(3000)
 ```
 ### express
-```
+```typescript
 const app = require('express')()
 
 app.get('/', (req, res) => res.send('Hello world'))
@@ -99,7 +99,7 @@ app.get('/', (req, res) => res.send('Hello world'))
 app.listen(3000)
 ```
 ### restify
-```
+```typescript
 const restify = require('restify')
 
 const server = restify.createServer()

@@ -1,4 +1,4 @@
-import { uMethods, uRequest, uResponse, uRouter } from '../src'
+import { uMethod, uRequest, uResponse, uRouter } from '../src'
 import { BooksRoute } from './books'
 
 @uRouter({
@@ -7,12 +7,12 @@ import { BooksRoute } from './books'
 })
 export class UsersRoute {
 
-  @uMethods.get()
+  @uMethod.get()
   helloUsers (req: uRequest, res: uResponse) {
     res.send('Here are the users: [John, Jane].')
   }
 
-  @uMethods.post()
+  @uMethod.post()
   createUser (req: uRequest, res: uResponse) {
     console.log('req.body', req.body)
     res.send('User created')

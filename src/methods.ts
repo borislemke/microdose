@@ -1,56 +1,26 @@
-import { MiddlewareFunction } from './middleware'
 import { PartyRouterStack } from './router'
 import { ensureURIValid } from './utils/ensure_url'
-import { StackItem } from './route_stack'
+import { IRequestMethod, StackItem } from './route_stack'
 
-const baseMethod = (method) => function (methodPath?: string | Function, methodMiddleware?: MiddlewareFunction) {
-
-  if (arguments.length > 2) {
-    throw new Error('@MicroRouter[method] requires exactly 2 parameters. 3 given')
-  }
-
-  // case: @MicroRouter.Get()
-  if (typeof methodPath === 'undefined' && typeof methodMiddleware === 'undefined') {
-    methodMiddleware = null
-    methodPath = '/'
-  }
-
-  // case: @MicroRouter.Get(middlewareFunction)
-  if (typeof methodPath === 'function' && typeof methodMiddleware === 'undefined') {
-    methodMiddleware = (methodPath as MiddlewareFunction)
-    methodPath = '/'
-  }
-
-  // Ensures that the routerStack path is valid
-  // e.g //some-path/that//is/not-valid/// -> /some-path/that/is/not-valid
-  /** TODO(opt): We might need to allow this? */
-  methodPath = ensureURIValid(methodPath as string)
-
+const descriptorModifier = (method: IRequestMethod, methodPath: string) => {
   return function (target, descriptorKey: string, descriptor: any): any {
-
-    // Clone original handler function
-    let handler = descriptor.value
+    let originalHandler = descriptor.value
 
     let indexOfPartyStack = -1
 
     const existingPartyStack = PartyRouterStack.find((_stack, index) => {
-
       indexOfPartyStack = index
-
       return _stack.routerName === target.constructor.name
     })
 
-    if (methodMiddleware) {
-      const originalFunction = handler
-      handler = (req, res) =>
-        methodMiddleware(req, res, (req2, res2) =>
-          originalFunction(req2 || req, res2 || res))
-    }
+    // Ensures that the routerStack path is valid
+    // e.g //some-path/that//is/not-valid/// -> /some-path/that/is/not-valid
+    methodPath = ensureURIValid(methodPath as string)
 
     const stackItem: StackItem = {
       method,
       path: (methodPath as string),
-      handler
+      handler: originalHandler
     }
 
     if (!existingPartyStack) {
@@ -66,7 +36,16 @@ const baseMethod = (method) => function (methodPath?: string | Function, methodM
   }
 }
 
-export const uMethods = {
+const baseMethod = (method) => function (methodPath = '/') {
+
+  if (arguments.length > 2) {
+    throw new Error('@MicroRouter[method] requires exactly 2 parameters. 3 given')
+  }
+
+  return descriptorModifier(method, methodPath)
+}
+
+export const uMethod = {
   get: baseMethod('GET'),
   post: baseMethod('POST'),
   put: baseMethod('PUT'),

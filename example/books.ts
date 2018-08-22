@@ -1,4 +1,4 @@
-import { HTTPStatusCodes, uMethods, uRequest, uResponse, uRouter } from '../src'
+import { HTTPStatusCodes, uMethod, uRequest, uResponse, uRouter } from '../src'
 import * as multer from 'multer'
 import { resolve } from 'path'
 import { uMiddleware } from '../src/middleware'
@@ -26,12 +26,12 @@ export interface IRequestWithFile extends uRequest {
 })
 export class BooksRoute {
 
-  @uMethods.get()
+  @uMethod.get()
   getBooks (req: uRequest, res: uResponse) {
     res.send('Books: Kama Sutra, The Design of Everyday Objects')
   }
 
-  @uMethods.post()
+  @uMethod.post()
   @uMiddleware(upload.single('avatar'))
   uploadAvatar (req: IRequestWithFile, res: uResponse) {
     copyFile(req.file.path, resolve(__dirname, 'uploads', req.file.originalname), err => {

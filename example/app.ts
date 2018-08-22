@@ -1,4 +1,4 @@
-import { uMethods, uRequest, uResponse, uRouter } from '../src'
+import { uMethod, uRequest, uResponse, uRouter } from '../src'
 import * as bodyParser from 'body-parser'
 import { UsersRoute } from './users'
 
@@ -10,7 +10,7 @@ import { UsersRoute } from './users'
 })
 export class App {
 
-  @uMethods.get()
+  @uMethod.get()
   helloWorld (req: uRequest, res: uResponse) {
     res.send('Hello world!')
   }

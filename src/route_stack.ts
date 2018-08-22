@@ -5,9 +5,11 @@ import { IncomingMessage, ServerResponse } from 'http'
 import { HTTPStatusCodes } from './status_codes'
 import { uApp } from './app'
 
+export type IRequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+
 export interface StackItem {
   path: string
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+  method: IRequestMethod
   handler: (req: uRequest, res: uResponse) => void
 }
 

@@ -1,21 +1,17 @@
 {
     "restartable": "rs",
-    "ignore": [
-        ".git",
-        "node_modules/**/node_modules"
-    ],
-    "verbose": true,
     "execMap": {
-        "js": "node --harmony"
-    },
-    "events": {
-        "restart": "osascript -e 'display notification \"App restarted\"'"
+        "ts": "ts-node"
     },
     "watch": [
-        "dist/"
+        "src/",
+        "example/"
+    ],
+    "ignore": [
+        "src/**/*.spec.ts"
     ],
     "env": {
         "NODE_ENV": "development"
     },
-    "ext": "js json"
+    "ext": "ts json"
 }

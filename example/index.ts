@@ -1,43 +1,12 @@
-import {
-    MicroRouter,
-    MicroMethod,
-    MicroResponse,
-    MicroRequest,
-    MicroBootstrap
-} from '../dist'
+import { uApp } from '../src'
+import { App } from './app'
 
-@MicroRouter()
-class ServerApp {
+const port = process.env.PORT || 3000
 
-    @MicroMethod.Get('/users')
-    helloWorld(req: MicroRequest, res: MicroResponse): void {
-        res.send('Hello World')
-    }
-
-    @MicroMethod.Post()
-    addHello(req: MicroRequest, res: MicroResponse): void {
-        console.log('req.headers', req.headers)
-        res.send(req.body)
-    }
-
-    @MicroMethod.Put()
-    putToTheTest(req: MicroRequest, res: MicroResponse): void {
-        console.log('put')
-        res.send(req.body.putty)
-    }
-
-    @MicroMethod.Patch()
-    eyePath(req: MicroRequest, res: MicroResponse): void {
-        console.log('patch')
-        res.send(req.body.patch_name)
-    }
-
-    @MicroMethod.Delete()
-    forgetMeNot(req: MicroRequest, res: MicroResponse): void {
-        res.send('Deleted!')
-    }
+const config = {
+  port
 }
 
-MicroBootstrap(ServerApp, 3000, () => {
-    console.log('listening')
-})
+uApp.bootstrap(App, config)
+.then(() => console.log('\nListening on port:', config.port))
+.catch(err => console.error(err))

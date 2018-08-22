@@ -1,8 +1,6 @@
 {
-    "extends": "tslint-config-standard",
-    "rules": {
-        "space-before-function-paren": false,
-        "ter-indent": 4
-    }
+  "extends": "tslint-config-standard",
+  "rules": {
+    "class-name": false
+  }
 }
-

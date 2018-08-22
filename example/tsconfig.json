@@ -1,27 +1,27 @@
 {
-    "compilerOptions": {
-        "declaration": true,
-        "stripInternal": true,
-        "experimentalDecorators": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "inlineSources": true,
-        "target": "es5",
-        "skipLibCheck": true,
-        "lib": [
-            "es7",
-            "dom"
-        ],
-        "typeRoots": [
-            "../node_modules/@types"
-        ]
-    },
-    "exclude": [
-        "../node_modules",
-        "../dist"
+  "compilerOptions": {
+    "declaration": true,
+    "stripInternal": true,
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "inlineSources": true,
+    "target": "es5",
+    "skipLibCheck": true,
+    "lib": [
+      "es7",
+      "dom"
     ],
-    "files": [
-        "index.ts"
+    "typeRoots": [
+      "../node_modules/@types"
     ]
+  },
+  "exclude": [
+    "../node_modules",
+    "../dist"
+  ],
+  "files": [
+    "index.ts"
+  ]
 }

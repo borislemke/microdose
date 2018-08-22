@@ -1,10 +1,9 @@
 # microdose
-A feather-light JavaScript API framework for Node, written 100% in TypeScript, built for micro-services. `microdose` is microdosing for servers.
+A feather-light JavaScript API framework for Node, written in TypeScript, built for micro-services.
+This is the fastest Node.js framework on this planet. See the benchmark results [here](https://github.com/borislemke/microdose/blob/master/BENCHMARK.md)
 
 [![codebeat badge](https://codebeat.co/badges/7dc9fafc-ccbc-4204-8390-82393527a667)](https://codebeat.co/projects/github-com-borislemke-microdose-master)
 [![npm version](https://badge.fury.io/js/microdose.svg)](https://badge.fury.io/js/microdose)
-
-This package is production ready.
 
 ## Documentation
 Documentation can be found on [here](https://borislemke.gitbooks.io/microdose/content/).

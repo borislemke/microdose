@@ -4,6 +4,7 @@
 .tmp
 build
 tsc-out
+dist
 
 # dependencies
 node_modules

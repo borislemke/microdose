@@ -1,6 +1,6 @@
 {
   "name": "microdose",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "A light-weight TypeScript web framework for Node with minimum external dependencies.",
   "author": "Boris Lemke <dimaslemek@gmail.com>",
   "homepage": "https://borislemke.gitbooks.io/microdose/content/",
@@ -19,10 +19,9 @@
     "rimraf": "rimraf",
     "clean": "npm run rimraf -- dist",
     "prebuild": "npm run clean",
-    "build": "npm run compile:prod",
-    "precompile": "npm run clean",
-    "compile": "tsc --watch -p tsconfig.json",
-    "compile:prod": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "prebuild:example": "npm run clean",
+    "build:example": "tsc -p tsconfig.example.json",
     "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

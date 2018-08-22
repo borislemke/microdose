@@ -7,7 +7,7 @@ A feather-light JavaScript API framework for Node, written 100% in TypeScript, b
 This package is production ready.
 
 ## Documentation
-Documentation can be found on `microdose`'s [GitBooks](https://borislemke.gitbooks.io/microdose/content/)
+Documentation can be found on [here](https://borislemke.gitbooks.io/microdose/content/).
 
 ## Hello World
 *src/server.ts*

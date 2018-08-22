@@ -64,7 +64,7 @@ export const ResponseBuilder = (response: ServerResponse): uResponse => {
 
     // Force type assertion as TS does not understand that the Object
     // has been dynamically merged.
-    return this as any
+    return this
   }
 
   extended.send = function (payload?: any): void {

@@ -14,7 +14,7 @@ var App = /** @class */ (function () {
         res.send('Hello world!');
     };
     __decorate([
-        src_1.uMethods.get()
+        src_1.uMethod.get()
     ], App.prototype, "helloWorld", null);
     App = __decorate([
         src_1.uRouter()

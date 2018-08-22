@@ -1,6 +1,6 @@
 {
   "name": "microdose",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "A light-weight TypeScript web framework for Node with minimum external dependencies.",
   "author": "Boris Lemke <dimaslemek@gmail.com>",
   "homepage": "https://borislemke.gitbooks.io/microdose/content/",
@@ -22,7 +22,7 @@
     "build": "tsc -p tsconfig.json",
     "prebuild:example": "npm run clean",
     "build:example": "tsc -p tsconfig.example.json",
-    "prepublish": "npm run build",
+    "prepublish": "npm run lint && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint -p . -c ./tslint.json"
   },

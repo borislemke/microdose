@@ -19,9 +19,7 @@
       "node_modules/@types"
     ]
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-    "example"
+  "include": [
+    "src"
   ]
 }

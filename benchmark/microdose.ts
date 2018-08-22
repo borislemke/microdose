@@ -21,3 +21,4 @@ const config = {
 
 uApp.bootstrap(App, config)
 .then(() => console.log('\nListening on port:', config.port))
+.catch(err => console.error(err))

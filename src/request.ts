@@ -1,8 +1,5 @@
 import { IncomingMessage } from 'http'
 
-export interface uRequest extends IncomingMessage, uRequestBuilder {
-}
-
 /**
  * We might not even need to have the request extended
  * we could theoretically leave it to middleware functions
@@ -56,7 +53,7 @@ export class uRequestBuilder {
       req[method] = _microRequest[method]
     }
 
-    return (req as uRequest)
+    return req as uRequest
   }
 
   /**
@@ -70,4 +67,7 @@ export class uRequestBuilder {
     // before looking up inside the request scoped `local` Object
     return this.nativeRequest.headers[key] || this.local[key] || null
   }
+}
+
+export interface uRequest extends IncomingMessage, uRequestBuilder {
 }

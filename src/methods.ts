@@ -15,11 +15,11 @@ const descriptorModifier = (method: IRequestMethod, methodPath: string) => {
 
     // Ensures that the routerStack path is valid
     // e.g //some-path/that//is/not-valid/// -> /some-path/that/is/not-valid
-    methodPath = ensureURIValid(methodPath as string)
+    methodPath = ensureURIValid(methodPath)
 
     const stackItem: StackItem = {
       method,
-      path: (methodPath as string),
+      path: methodPath,
       handler: originalHandler
     }
 
@@ -36,7 +36,7 @@ const descriptorModifier = (method: IRequestMethod, methodPath: string) => {
   }
 }
 
-const baseMethod = (method) => function (methodPath = '/') {
+const baseMethod = (method: IRequestMethod) => function (methodPath = '/') {
 
   if (arguments.length > 2) {
     throw new Error('@MicroRouter[method] requires exactly 2 parameters. 3 given')

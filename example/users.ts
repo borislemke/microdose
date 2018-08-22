@@ -14,6 +14,7 @@ export class UsersRoute {
 
   @uMethods.post()
   createUser (req: uRequest, res: uResponse) {
+    console.log('req.body', req.body)
     res.send('User created')
   }
 }

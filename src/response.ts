@@ -1,8 +1,7 @@
 import { ServerResponse } from 'http'
 import { HTTPStatusCodes } from './status_codes'
 
-export interface uResponse extends ServerResponse, uResponseBuilder {
-}
+export type uResponse = ServerResponse & uResponseBuilder
 
 export interface ResponseHeaders {
   [key: string]: string
@@ -20,7 +19,7 @@ export class uResponseBuilder {
    * @type {number}
    * @private
    */
-  private _statusCode: HTTPStatusCodes = 200
+  private statusCode: HTTPStatusCodes = 200
 
   /**
    * Default Content-Type header.
@@ -82,11 +81,11 @@ export class uResponseBuilder {
    */
   public status (statusCode: HTTPStatusCodes): uResponse {
     // Sets the status code of the next response.
-    this._statusCode = statusCode
+    this.statusCode = statusCode
 
     // Force type assertion as TS does not understand that the Object
     // has been dynamically merged.
-    return this as any as uResponse
+    return this as any
   }
 
   public send (payload?: any): void {
@@ -104,8 +103,14 @@ export class uResponseBuilder {
 
     const contentLength = payload.length
 
-    // Provide Content-Length header value.
-    this.nativeResponse.setHeader('Content-Length', contentLength)
+    this.nativeResponse.writeHead(
+      this.statusCode,
+      {
+        ...uResponseBuilder.defaultResponseHeaders,
+        // Provide Content-Length header value.
+        'Content-Length': contentLength
+      }
+    )
 
     // End connection and send off payload.
     this.nativeResponse.end(Buffer.from(payload))

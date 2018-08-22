@@ -1,7 +1,8 @@
 {
   "name": "microdose",
-  "version": "0.6.42",
+  "version": "0.7.0",
   "description": "A light-weight TypeScript web framework for Node with minimum external dependencies.",
+  "author": "Boris Lemke <dimaslemek@gmail.com>",
   "homepage": "https://borislemke.gitbooks.io/microdose/content/",
   "keywords": [
     "framewrok",
@@ -22,9 +23,9 @@
     "precompile": "npm run clean",
     "compile": "tsc --watch -p tsconfig.json",
     "compile:prod": "tsc -p tsconfig.json",
+    "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Boris Lemke <boris@fleava.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/borislemke/microdose.git"

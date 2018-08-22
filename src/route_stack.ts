@@ -72,30 +72,11 @@ export class RouteStackC {
       const mRequest = uRequestBuilder.create(req)
 
       // Retrieve first handler of the matching router stack
-      matchingRoutesStack[0].handler(mRequest, mResponse)
-
-      // There can only be 1 handler per method if on turboMode
-      if (matchingRoutesStack.length > 1 && process.env.NODE_ENV !== 'production') {
-        console.warn('WARNING: `Turbo Mode` is enable but microdose'
-        + ` detected multiple handlers for ${req.method} requests.\n`)
-      }
-
-      return
+      return matchingRoutesStack[0].handler(mRequest, mResponse)
     }
 
     // The URL of the current request
     const incomingRequestPath = parseUrl(req).pathname
-
-    /**
-     * TODO(production): Remove, browser testing only
-     * @date - 5/27/17
-     * @time - 2:56 AM
-     */
-    if (incomingRequestPath.includes('favicon')) {
-      res.writeHead(204, { 'Content-Type': 'plain/text' })
-      res.end()
-      return
-    }
 
     // Matching routerStack for the current incoming request
     let routeMatch
@@ -161,14 +142,17 @@ export class RouteStackC {
     }
 
     // Create the request and response object only after a route match has been found
-    const mResponse = uResponseBuilder.create(res)
-    const mRequest = uRequestBuilder.create(req)
+    const uResponse = uResponseBuilder.create(res)
+
+    const uRequest = uRequestBuilder.create(req)
 
     // Attach params to current request context
-    if (params) mRequest.params = params
+    if (params) {
+      uRequest.params = params
+    }
 
     // Execute matching route handler
-    routeMatch.handler(mRequest, mResponse)
+    routeMatch.handler(uRequest, uResponse)
   }
 }
 

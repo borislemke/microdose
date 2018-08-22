@@ -13,23 +13,28 @@ Documentation can be found on `microdose`'s [GitBooks](https://borislemke.gitboo
 *src/server.ts*
 ```typescript
 import {
-    MicroBootstrap,
-    MicroRouter,
-    MicroMethod,
-    MicroRequest,
-    MicroResponse
+  uApp,
+  uMethods,
+  uRequest,
+  uResponse,
+  uRouter
 } from 'microdose'
 
-@MicroRouter()
-class MyRouter {
+@uRouter()
+class App {
 
-    @MicroMethod.Get()
-    helloWorld(req: MicroRequest, res: MicroResponse): void {
-        res.send('Hello World')
-    }
+  @uMethods.get()
+  helloWorld (req: uRequest, res: uResponse) {
+    res.send('Hello world!')
+  }
 }
 
-MicroBootstrap(MyRouter, 3000)
+const config = {
+  port: 3000
+}
+
+uApp.bootstrap(App, config)
+.then(() => console.log('\nListening on port:', config.port))
 ```
 
 ## Features

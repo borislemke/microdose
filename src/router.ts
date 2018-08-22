@@ -52,13 +52,9 @@ export function uRouter (config: IRouterConfig = {}) {
     const rStack = PartyRouterStack
     .find(_stack => _stack.routerName === target.name)
 
-    if (rStack) {
-      rStack.routerStack = rStack.routerStack.map(stack => {
-        // Apply Router and Router children scoped `prefix` if provided
-        stack.path = ensureURIValid(prefix, stack.path)
-
-        return stack
-      })
+    rStack && rStack.routerStack && rStack.routerStack.forEach(stack => {
+      // Apply Router and Router children scoped `prefix` if provided
+      stack.path = ensureURIValid(prefix, stack.path)
 
       /**
        * Wrap all functions inside a MiddlewareFunction if provided.
@@ -66,11 +62,11 @@ export function uRouter (config: IRouterConfig = {}) {
        * applied.
        */
       if (middleware && middleware.length) {
-        rStack.routerStack.forEach(stack => {
-          stack.handler = wrapMiddleware(middleware, stack.handler)
-        })
+        stack.handler = wrapMiddleware(middleware, stack.handler)
       }
-    }
+
+      RouteStack.addStack(stack)
+    })
 
     return target
   }

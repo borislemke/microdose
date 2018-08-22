@@ -42,7 +42,6 @@ export const wrapMiddleware = (middleware: Function[], originalMethod: Function)
 
 export function uMiddleware (...middleware: MiddlewareFunction[]) {
   return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): any {
-
     descriptor.value = wrapMiddleware(middleware, descriptor.value)
 
     return descriptor

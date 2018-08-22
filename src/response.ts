@@ -1,48 +1,27 @@
-import { ServerResponse } from 'http'
+import { OutgoingHttpHeaders, ServerResponse } from 'http'
 import { HTTPStatusCodes } from './status_codes'
-
-export type uResponse = ServerResponse & uResponseBuilder
 
 export interface ResponseHeaders {
   [key: string]: string
 }
 
-export class uResponseBuilder {
+export interface uResponse extends ServerResponse {
+  defaultResponseHeaders: OutgoingHttpHeaders
+  set: (key: string, value: string) => void
+  sendStatus: (statusCode: number) => void
+  status: (statusCode: HTTPStatusCodes) => uResponse
+  send: (payload?: any) => void
+}
 
-  /**
-   * Reference to the original Node ServerResponse object.
-   */
-  nativeResponse: ServerResponse
-
-  /**
-   * Default response status code.
-   * @type {number}
-   * @private
-   */
-  private statusCode: HTTPStatusCodes = 200
+export const ResponseBuilder = (response: ServerResponse): uResponse => {
+  const extended: uResponse = response as any
 
   /**
    * Default Content-Type header.
    * @type {ResponseHeaders}
    */
-  static defaultResponseHeaders: ResponseHeaders = {
+  extended.defaultResponseHeaders = {
     'Content-Type': 'text/plain; charset=utf-8'
-  }
-
-  constructor (_res: ServerResponse) {
-    this.nativeResponse = _res
-  }
-
-  public static create (res: ServerResponse): uResponse {
-    // Extended response object.
-    const microResponse = new uResponseBuilder(res)
-
-    // Merge properties of ServerResponse with uResponse.
-    for (let method in microResponse) {
-      res[method] = microResponse[method]
-    }
-
-    return res as uResponse
   }
 
   /**
@@ -50,16 +29,16 @@ export class uResponseBuilder {
    * @param key
    * @param value
    */
-  public set (key: string, value: string): void {
-    this.nativeResponse.setHeader(key, value)
+  extended.set = function (key: string, value: string): void {
+    this.setHeader(key, value)
   }
 
   /**
    * Sends an empty response with the response code only as the header.
    * @param statusCode
    */
-  public sendStatus (statusCode: number): void {
-    this.nativeResponse.writeHead(statusCode, uResponseBuilder.defaultResponseHeaders)
+  extended.sendStatus = function (statusCode: number): void {
+    this.writeHead(statusCode, this.defaultResponseHeaders)
 
     let statusText: string = statusCode + ': UNKNOWN STATUS CODE'
 
@@ -69,9 +48,9 @@ export class uResponseBuilder {
       }
     }
 
-    this.nativeResponse.write(statusText)
+    this.write(statusText)
 
-    this.nativeResponse.end()
+    this.end()
   }
 
   /**
@@ -79,7 +58,7 @@ export class uResponseBuilder {
    * @param statusCode
    * @returns {uResponse}
    */
-  public status (statusCode: HTTPStatusCodes): uResponse {
+  extended.status = function (statusCode: HTTPStatusCodes): uResponse {
     // Sets the status code of the next response.
     this.statusCode = statusCode
 
@@ -88,7 +67,7 @@ export class uResponseBuilder {
     return this as any
   }
 
-  public send (payload?: any): void {
+  extended.send = function (payload?: any): void {
     // Determine what the final payload should be by analyzing it's
     // type.
     const payloadType = typeof payload
@@ -103,16 +82,18 @@ export class uResponseBuilder {
 
     const contentLength = payload.length
 
-    this.nativeResponse.writeHead(
+    this.writeHead(
       this.statusCode,
       {
-        ...uResponseBuilder.defaultResponseHeaders,
+        ...this.defaultResponseHeaders,
         // Provide Content-Length header value.
         'Content-Length': contentLength
       }
     )
 
     // End connection and send off payload.
-    this.nativeResponse.end(Buffer.from(payload))
+    this.end(Buffer.from(payload))
   }
+
+  return extended
 }

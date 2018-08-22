@@ -1,11 +1,11 @@
-import { MiddlewareFunction, wrapMiddleware } from './middleware'
+import { RequestHandler, wrapMiddleware } from './middleware'
 import { ensureURIValid } from './utils/ensure_url'
 import { RouteStack } from './route_stack'
 
 export interface IRouterConfig {
   prefix?: string
   children?: any[]
-  middleware?: MiddlewareFunction[]
+  middleware?: RequestHandler[]
 }
 
 export interface IPartyStack {

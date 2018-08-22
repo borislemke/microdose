@@ -1,9 +1,9 @@
 import * as parseUrl from 'parseurl'
-import { uResponse, uResponseBuilder } from './response'
-import { uRequest, uRequestBuilder } from './request'
+import { ResponseBuilder, uResponse } from './response'
 import { IncomingMessage, ServerResponse } from 'http'
 import { HTTPStatusCodes } from './status_codes'
 import { uApp } from './app'
+import { RequestBuilder, uRequest } from './request'
 
 export type IRequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
@@ -18,7 +18,7 @@ export interface RouteStackGroup {
 }
 
 const earlyReturn = (res: ServerResponse) => {
-  res.writeHead(HTTPStatusCodes.NOT_FOUND, uResponseBuilder.defaultResponseHeaders)
+  res.writeHead(HTTPStatusCodes.NOT_FOUND, { 'Content-Type': 'text/plain; charset=utf-8' })
   res.end('Not Found')
 }
 
@@ -69,9 +69,9 @@ export class RouteStackC {
     // If TURBO_MODE is enabled, we only need to match the method as there can
     // only be a single handler function of each method. Path matching is disabled
     if (uApp.TURBO_MODE) {
-      const mResponse = uResponseBuilder.create(res)
+      const mResponse = ResponseBuilder(res)
 
-      const mRequest = uRequestBuilder.create(req)
+      const mRequest = RequestBuilder(req)
 
       // Retrieve first handler of the matching router stack
       return matchingRoutesStack[0].handler(mRequest, mResponse)
@@ -144,17 +144,17 @@ export class RouteStackC {
     }
 
     // Create the request and response object only after a route match has been found
-    const uResponse = uResponseBuilder.create(res)
+    const uRes = ResponseBuilder(res)
 
-    const uRequest = uRequestBuilder.create(req)
+    const uReq = RequestBuilder(req)
 
     // Attach params to current request context
     if (params) {
-      uRequest.params = params
+      uReq.params = params
     }
 
     // Execute matching route handler
-    routeMatch.handler(uRequest, uResponse)
+    routeMatch.handler(uReq, uRes)
   }
 }
 

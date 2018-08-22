@@ -1,4 +1,4 @@
-export { MiddlewareFunction } from './middleware'
+export { RequestHandler } from './middleware'
 export { uApp } from './app'
 export { uRouter } from './router'
 export { uMethod } from './methods'

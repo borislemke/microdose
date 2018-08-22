@@ -1,16 +1,11 @@
 import { uRequest } from './request'
 import { uResponse } from './response'
-import { Request, Response } from 'express'
+import { IncomingMessage, ServerResponse } from 'http'
 
-export interface NextFunction {
-  (req?: uRequest, res?: uResponse): void
-}
+export type NextFunction = (err?: any) => void
 
-export interface RequestHandler<Rq extends Request, Rs extends Response> {
+export interface RequestHandler<Rq extends IncomingMessage = any, Rs extends ServerResponse = any> {
   (req: uRequest & Rq, res: uResponse & Rs, next?: NextFunction): void
-}
-
-export interface MiddlewareFunction extends RequestHandler<any, any> {
 }
 
 /**
@@ -40,7 +35,7 @@ export const wrapMiddleware = (middleware: Function[], originalMethod: Function)
   return originalMethod
 }
 
-export function uMiddleware (...middleware: MiddlewareFunction[]) {
+export function uMiddleware<Rq extends IncomingMessage, Rs extends ServerResponse> (...middleware: RequestHandler<Rq, Rs>[]) {
   return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): any {
     descriptor.value = wrapMiddleware(middleware, descriptor.value)
 

@@ -1,0 +1,82 @@
+# microdose vs other frameworks, the battle is on
+
+Benchmarked with `autocannon`:
+- Run on a MacBook Pro (Retina, 13-inch, early 2015), 2,9 GHz Intel Core i5, 8 GB 1867 MHz DDR3, macOS 10.13.6
+
+```sh
+$ autocannon -p 10 -c 1000 -d 30 http://localhost:3000
+```
+
+## microdose
+```typescript
+import {
+    MicroBootstrap,
+    MicroRouter,
+    MicroResponse,
+    MicroRequest,
+    MicroMethod
+} from 'microdose'
+
+@MicroRouter()
+export class MicroApp {
+
+    @MicroMethod.Get()
+    sayHello(req: MicroRequest, res: MicroResponse): void {
+        res.send('Hello world')
+    }
+}
+
+MicroBootstrap(MicroApp)
+```
+
+## Pure Node.js
+```typescript
+const http = require('http')
+
+http.createServer((req, res) => {
+    res.writeHead(200, {'Content-Type': 'plain/text; charset=utf-8'})
+    res.end('Hello World')
+}).listen(3000)
+```
+
+## koa.js
+```typescript
+const Koa = require('koa')
+const app = new Koa()
+
+app.use(ctx => ctx.body = 'Hello World')
+
+app.listen(3000)
+```
+
+## express
+```typescript
+const app = require('express')()
+
+app.get('/', (req, res) => res.send('Hello world'))
+
+app.listen(3000)
+```
+
+## restify
+```typescript
+const restify = require('restify')
+
+const server = restify.createServer()
+
+server.get('/', (req, res) => res.send('Hello World'))
+
+server.listen(3000)
+```
+
+
+Benchmark results:
+
+| Framework     | Req/Sec   | Transfer/Sec(MB) | Avg. Latency(ms) | Max. Latency(ms) | Errors |
+| ------------- | --------: | ---------------: | ---------------: | ---------------: | -----: |
+| microdose+uWS  | 25,229.34 | 1.25             | 51.82            | 1,934            | 0      |
+| Node.js       | 12,195.20 | 1.88             | 81.43            | 3,299            | 40     |
+| microdose      | 7,529.40  | 1.29             | 130.74           | 3,378            | 0      |
+| koa           | 6,933.47  | 1.05             | 141.23           | 5,776            | 0      |
+| express       | 5,512.54  | 1.19             | 176.45           | 7,783            | 12     |
+| restify       | 3,470.2   | 0.503            | 272.28           | 9,549            | 0     |

@@ -10,23 +10,38 @@ $ autocannon -p 10 -c 1000 -d 30 http://localhost:3000
 ## microdose
 ```typescript
 import {
-    MicroBootstrap,
-    MicroRouter,
-    MicroResponse,
-    MicroRequest,
-    MicroMethod
+  uApp,
+  uMethods,
+  uRequest,
+  uResponse,
+  uRouter
 } from 'microdose'
 
-@MicroRouter()
-export class MicroApp {
+@uRouter()
+class App {
 
-    @MicroMethod.Get()
-    sayHello(req: MicroRequest, res: MicroResponse): void {
-        res.send('Hello world')
-    }
+  @uMethods.get()
+  helloWorld (req: uRequest, res: uResponse) {
+    res.send('Hello world!')
+  }
 }
 
-MicroBootstrap(MicroApp)
+const config = {
+  port: 3000,
+  turboMode: false
+}
+
+uApp.bootstrap(App, config)
+.then(() => console.log('\nListening on port:', config.port))
+```
+
+## microdose with TurboMode
+Same as above but `turboMode` is set to `true`.
+```typescript
+const config = {
+  port: 3000,
+  turboMode: true
+}
 ```
 
 ## Pure Node.js
@@ -72,11 +87,11 @@ server.listen(3000)
 
 Benchmark results:
 
-| Framework     | Req/Sec   | Transfer/Sec(MB) | Avg. Latency(ms) | Max. Latency(ms) | Errors |
-| ------------- | --------: | ---------------: | ---------------: | ---------------: | -----: |
-| microdose+uWS  | 25,229.34 | 1.25             | 51.82            | 1,934            | 0      |
-| Node.js       | 12,195.20 | 1.88             | 81.43            | 3,299            | 40     |
-| microdose      | 7,529.40  | 1.29             | 130.74           | 3,378            | 0      |
-| koa           | 6,933.47  | 1.05             | 141.23           | 5,776            | 0      |
-| express       | 5,512.54  | 1.19             | 176.45           | 7,783            | 12     |
-| restify       | 3,470.2   | 0.503            | 272.28           | 9,549            | 0     |
+| Framework        | Req/Sec   | Transfer/Sec(MB) | Avg. Latency(ms) | Max. Latency(ms) | Errors |
+| ---------------- | --------: | ---------------: | ---------------: | ---------------: | -----: |
+| Node.js          | 19,466.2  | 3.31             | 50.92            | 5,365.92         | 11     |
+| microdose(Turbo) | 19,806.2  | 3.02             | 02.12            | 3,571.46         | 2      |
+| microdose        | 19,068.87 | 2.92             | 52.07            | 3,904.16         | 4      |
+| koa              | 17,660.2  | 2.69             | 56.19            | 4,202.71         | 2      |
+| restify          | 13,748.5  | 2.23             | 72.79            | 2,633.66         | 3      |
+| express          | 11,899.44 | 2.55             | 83.07            | 9,994.24         | 2      |

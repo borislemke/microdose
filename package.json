@@ -1,6 +1,6 @@
 {
   "name": "microdose",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "A light-weight TypeScript web framework for Node with minimum external dependencies.",
   "author": "Boris Lemke <dimaslemek@gmail.com>",
   "homepage": "https://borislemke.gitbooks.io/microdose/content/",

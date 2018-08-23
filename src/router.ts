@@ -1,4 +1,5 @@
 import { RequestHandler, wrapMiddleware } from './middleware'
+import { Methods } from './methods'
 import { ensureURIValid } from './utils/ensure_url'
 import { RouteStack } from './route_stack'
 
@@ -8,64 +9,67 @@ export interface IRouterConfig {
   middleware?: RequestHandler[]
 }
 
-export interface IPartyStack {
-  routerName: string
-  routerStack: any[]
-}
+export class Routers {
+  static routers: any[] = []
 
-export const PartyRouterStack: IPartyStack[] = []
+  static flatRoutes: any[] = []
+
+  static entryRouter: any
+
+  static attach (app: any) {
+    const entryRouter = this.entryRouter = this.routers.find(router => router.router === app.name)
+
+    if (!entryRouter) {
+      console.warn('No entry router provided')
+    }
+
+    this.flattenRouter()
+  }
+
+  static iterateOverChildren (router: any, parentMiddleware: RequestHandler[] = [], parentPrefix: string = '') {
+    const {
+      middleware = [],
+      prefix
+    } = router
+
+    const previousMiddleware = [...parentMiddleware, ...middleware]
+
+    const previousPrefix = ensureURIValid(parentPrefix, prefix)
+
+    router.handlers.forEach(handler => {
+      RouteStack.addStack({
+        method: handler.method,
+        path: ensureURIValid(previousPrefix, handler.path),
+        handler: wrapMiddleware(handler.handler, previousMiddleware)
+      })
+    })
+
+    if (router.children && router.children.length) {
+      router.children.forEach(child => {
+        child.forEach(c => this.iterateOverChildren(c, previousMiddleware, previousPrefix))
+      })
+    }
+  }
+
+  static flattenRouter () {
+    this.iterateOverChildren(this.entryRouter)
+  }
+}
 
 export function uRouter (config: IRouterConfig = {}) {
   const {
     prefix = '',
     children = [],
-    middleware
+    middleware = []
   } = config
 
   return function (target: any): any {
-    if (children) {
-      children.forEach(rChild => {
-        /**
-         * Look up for a RouterStack that is a direct child of the current RouterStack
-         * @type {IPartyStack}
-         */
-        const partyRouterChildren = PartyRouterStack.find(r => r.routerName === rChild.name)
-
-        if (partyRouterChildren && partyRouterChildren.routerStack.length) {
-          PartyRouterStack.splice(PartyRouterStack.indexOf(partyRouterChildren), 1)
-
-          partyRouterChildren
-          .routerStack
-          .forEach(cRoute => {
-            cRoute.path = ensureURIValid(prefix, rChild.prefix, cRoute.path)
-
-            if (middleware && middleware.length) {
-              cRoute.handler = wrapMiddleware(middleware, cRoute.handler)
-            }
-
-            RouteStack.addStack(cRoute)
-          })
-        }
-      })
-    }
-
-    const rStack = PartyRouterStack
-    .find(_stack => _stack.routerName === target.name)
-
-    rStack && rStack.routerStack && rStack.routerStack.forEach(stack => {
-      // Apply Router and Router children scoped `prefix` if provided
-      stack.path = ensureURIValid(prefix, stack.path)
-
-      /**
-       * Wrap all functions inside a MiddlewareFunction if provided.
-       * The order of the middleware MUST be reversed before being???
-       * applied.
-       */
-      if (middleware && middleware.length) {
-        stack.handler = wrapMiddleware(middleware, stack.handler)
-      }
-
-      RouteStack.addStack(stack)
+    Routers.routers.push({
+      router: target.name,
+      prefix,
+      handlers: Methods.methods.filter(meth => meth.router === target.name),
+      children: children.map(child => Routers.routers.filter(r => r.router === child.name)),
+      middleware
     })
 
     return target

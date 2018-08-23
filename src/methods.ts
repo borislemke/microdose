@@ -1,36 +1,21 @@
-import { PartyRouterStack } from './router'
 import { ensureURIValid } from './utils/ensure_url'
 import { IRequestMethod, StackItem } from './route_stack'
 
-const descriptorModifier = (method: IRequestMethod, methodPath: string) => {
+export class Methods {
+  static methods: StackItem[] = []
+}
+
+const descriptorModifier = (method: IRequestMethod, methodPath = '/') => {
 
   return function (target: any, propertyKey: string, property: any): any {
-    let originalHandler = property.value
-
-    let indexOfRouterGroup = -1
-
-    const routerGroup = PartyRouterStack.find((stack, index) => {
-      indexOfRouterGroup = index
-      return stack.routerName === target.constructor.name
+    Methods.methods.push({
+      method,
+      router: target.constructor.name,
+      handler: property.value,
+      path: ensureURIValid(methodPath)
     })
 
-    const stackItem: StackItem = {
-      method,
-      router: target.name,
-      path: ensureURIValid(methodPath),
-      handler: originalHandler
-    }
-
-    if (!routerGroup) {
-      PartyRouterStack.push({
-        routerName: target.constructor.name,
-        routerStack: [stackItem]
-      })
-    } else {
-      PartyRouterStack[indexOfRouterGroup].routerStack.push(stackItem)
-    }
-
-    return property
+    return property.value
   }
 }
 

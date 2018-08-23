@@ -14,4 +14,9 @@ export class App {
   helloWorld (req: uRequest, res: uResponse) {
     res.send('Hello world!')
   }
+
+  @uMethod.get('/*')
+  notFound (req: uRequest, res: uResponse) {
+    res.send('Any are you okay?')
+  }
 }

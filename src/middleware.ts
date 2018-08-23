@@ -21,13 +21,17 @@ export interface RequestHandler<Rq extends IncomingMessage = any, Rs extends Ser
  * @param middleware
  * @param originalMethod
  */
-export const wrapMiddleware = (middleware: Function[], originalMethod: Function): Function => {
+export const wrapMiddleware = (originalMethod: RequestHandler, middleware?: RequestHandler[]): RequestHandler => {
+  if (!middleware || !middleware.length) {
+    return originalMethod
+  }
+
   middleware.reverse()
   .forEach(_middleware => {
     const originalHandler = originalMethod
     originalMethod = (req, res) => {
-      _middleware(req, res, (req2, res2) => {
-        originalHandler(req2 || req, res2 || res)
+      _middleware(req, res, () => {
+        originalHandler(req, res)
       })
     }
   })
@@ -37,7 +41,7 @@ export const wrapMiddleware = (middleware: Function[], originalMethod: Function)
 
 export function uMiddleware<Rq extends IncomingMessage, Rs extends ServerResponse> (...middleware: RequestHandler<Rq, Rs>[]) {
   return function (target: any, propertyKey: string | symbol, property: PropertyDescriptor): any {
-    property.value = wrapMiddleware(middleware, property.value)
+    property.value = wrapMiddleware(property.value, middleware)
 
     return property
   }

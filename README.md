@@ -62,3 +62,28 @@ Visit `http://localhost:3000` to see `Hello World`.
 
 ## Future
  - [ ] Replace `path-to-regexp` with simpler custom alternative
+ - [ ] Support URL queries (easy)
+
+## Issues
+Wildcard does not work on root router:
+```typescript
+@uRouter({
+  children: [UsersRoute],
+  middleware: [
+    bodyParser.json()
+  ]
+})
+export class App {
+
+  @uMethod.get()
+  helloWorld (req: uRequest, res: uResponse) {
+    res.send('Hello world!')
+  }
+
+  @uMethod.get('/*')
+  notFound (req: uRequest, res: uResponse) {
+    res.send('Any are you okay?')
+  }
+}
+```
+Visiting `host:port/` will always return the `/*` handler first.

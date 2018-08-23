@@ -36,9 +36,9 @@ export const wrapMiddleware = (middleware: Function[], originalMethod: Function)
 }
 
 export function uMiddleware<Rq extends IncomingMessage, Rs extends ServerResponse> (...middleware: RequestHandler<Rq, Rs>[]) {
-  return function (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): any {
-    descriptor.value = wrapMiddleware(middleware, descriptor.value)
+  return function (target: any, propertyKey: string | symbol, property: PropertyDescriptor): any {
+    property.value = wrapMiddleware(middleware, property.value)
 
-    return descriptor
+    return property
   }
 }

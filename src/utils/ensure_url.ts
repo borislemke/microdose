@@ -1,3 +1,5 @@
+// Ensures a path is valid.
+// e.g //some-path/that//is/not-valid/// -> /some-path/that/is/not-valid
 export const ensureURIValid = (...routes: string[]) => {
 
   let route = routes.join('/')

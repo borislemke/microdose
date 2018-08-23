@@ -3,36 +3,34 @@ import { ensureURIValid } from './utils/ensure_url'
 import { IRequestMethod, StackItem } from './route_stack'
 
 const descriptorModifier = (method: IRequestMethod, methodPath: string) => {
-  return function (target, descriptorKey: string, descriptor: any): any {
-    let originalHandler = descriptor.value
 
-    let indexOfPartyStack = -1
+  return function (target: any, propertyKey: string, property: any): any {
+    let originalHandler = property.value
 
-    const existingPartyStack = PartyRouterStack.find((_stack, index) => {
-      indexOfPartyStack = index
-      return _stack.routerName === target.constructor.name
+    let indexOfRouterGroup = -1
+
+    const routerGroup = PartyRouterStack.find((stack, index) => {
+      indexOfRouterGroup = index
+      return stack.routerName === target.constructor.name
     })
-
-    // Ensures that the routerStack path is valid
-    // e.g //some-path/that//is/not-valid/// -> /some-path/that/is/not-valid
-    methodPath = ensureURIValid(methodPath)
 
     const stackItem: StackItem = {
       method,
-      path: methodPath,
+      router: target.name,
+      path: ensureURIValid(methodPath),
       handler: originalHandler
     }
 
-    if (!existingPartyStack) {
+    if (!routerGroup) {
       PartyRouterStack.push({
         routerName: target.constructor.name,
         routerStack: [stackItem]
       })
     } else {
-      PartyRouterStack[indexOfPartyStack].routerStack.push(stackItem)
+      PartyRouterStack[indexOfRouterGroup].routerStack.push(stackItem)
     }
 
-    return descriptor.value
+    return property
   }
 }
 

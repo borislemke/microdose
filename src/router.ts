@@ -22,7 +22,7 @@ export function uRouter (config: IRouterConfig = {}) {
     middleware
   } = config
 
-  return function (target): any {
+  return function (target: any): any {
     if (children) {
       children.forEach(rChild => {
         /**

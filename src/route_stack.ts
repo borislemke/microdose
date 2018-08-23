@@ -8,6 +8,7 @@ import { RequestBuilder, uRequest } from './request'
 export type IRequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 
 export interface StackItem {
+  router?: string
   path: string
   method: IRequestMethod
   handler: (req: uRequest, res: uResponse) => void

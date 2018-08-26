@@ -13,7 +13,7 @@ Documentation can be found on [here](https://borislemke.gitbooks.io/microdose/co
 ```typescript
 import {
   uApp,
-  uMethods,
+  uMethod,
   uRequest,
   uResponse,
   uRouter
@@ -22,7 +22,7 @@ import {
 @uRouter()
 class App {
 
-  @uMethods.get()
+  @uMethod.get()
   helloWorld (req: uRequest, res: uResponse) {
     res.send('Hello world!')
   }

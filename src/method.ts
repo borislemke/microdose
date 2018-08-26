@@ -1,14 +1,18 @@
 import { ensureURIValid } from './utils/ensure_url'
 import { IRequestMethod, StackItem } from './route_stack'
 
-export class Methods {
+export class MethodStore {
   static methods: StackItem[] = []
+
+  static addHandler (handler: StackItem) {
+    this.methods.push(handler)
+  }
 }
 
 const descriptorModifier = (method: IRequestMethod, methodPath = '/') => {
 
   return function (target: any, propertyKey: string, property: any): any {
-    Methods.methods.push({
+    MethodStore.addHandler({
       method,
       router: target.constructor.name,
       handler: property.value,

@@ -1,5 +1,5 @@
 import { RequestHandler, wrapMiddleware } from './middleware'
-import { Methods } from './methods'
+import { MethodStore } from './method'
 import { ensureURIValid } from './utils/ensure_url'
 import { RouteStack } from './route_stack'
 
@@ -12,9 +12,11 @@ export interface IRouterConfig {
 export class Routers {
   static routers: any[] = []
 
-  static flatRoutes: any[] = []
-
   static entryRouter: any
+
+  static add (router: any) {
+    this.routers.push(router)
+  }
 
   static attach (app: any) {
     const entryRouter = this.entryRouter = this.routers.find(router => router.router === app.name)
@@ -64,10 +66,10 @@ export function uRouter (config: IRouterConfig = {}) {
   } = config
 
   return function (target: any): any {
-    Routers.routers.push({
+    Routers.add({
       router: target.name,
       prefix,
-      handlers: Methods.methods.filter(meth => meth.router === target.name),
+      handlers: MethodStore.methods.filter(meth => meth.router === target.name),
       children: children.map(child => Routers.routers.filter(r => r.router === child.name)),
       middleware
     })

@@ -11,7 +11,7 @@ $ autocannon -p 10 -c 1000 -d 30 http://localhost:3000
 ```typescript
 import {
   uApp,
-  uMethods,
+  uMethod,
   uRequest,
   uResponse,
   uRouter
@@ -20,7 +20,7 @@ import {
 @uRouter()
 class App {
 
-  @uMethods.get()
+  @uMethod.get()
   helloWorld (req: uRequest, res: uResponse) {
     res.send('Hello world!')
   }
